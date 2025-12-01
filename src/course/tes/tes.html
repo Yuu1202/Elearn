@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Section Pembelajaran</title>
+    <link rel="stylesheet" href="tes.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar Section List -->
+        <aside class="section-sidebar">
+            <a href="#" class="back-button">← Kembali</a>
+            
+            <div class="section-list">
+                <h3>Daftar Section</h3>
+                
+                <!-- 
+                    [DATABASE: section_progress]
+                    Query: SELECT sp.section_id, sp.is_completed
+                           FROM section_progress sp
+                           WHERE sp.user_id = ? AND sp.course_id = ?
+                    
+                    Tambahkan class 'completed' jika is_completed = 1
+                -->
+                
+                <div class="section-item active completed">
+                    <!-- [DATABASE: is_completed] jika true, tampilkan icon centang -->
+                    <span class="check-icon">✓</span>
+                    <span class="section-number">1.</span>
+                    <span class="section-title">Lorem Ipsum Dolor</span>
+                </div>
+                
+                <div class="section-item completed">
+                    <span class="check-icon">✓</span>
+                    <span class="section-number">2.</span>
+                    <span class="section-title">Sit Amet Consectetur</span>
+                </div>
+                
+                <div class="section-item completed">
+                    <span class="check-icon">✓</span>
+                    <span class="section-number">3.</span>
+                    <span class="section-title">Adipiscing Elit</span>
+                </div>
+                
+                <div class="section-item active-now">
+                    <span class="check-icon empty">○</span>
+                    <span class="section-number">4.</span>
+                    <span class="section-title">Sed Do Eiusmod</span>
+                </div>
+                
+                <div class="section-item">
+                    <span class="check-icon empty">○</span>
+                    <span class="section-number">5.</span>
+                    <span class="section-title">Tempor Incididunt</span>
+                </div>
+                
+                <div class="section-item">
+                    <span class="check-icon empty">○</span>
+                    <span class="section-number">6.</span>
+                    <span class="section-title">Ut Labore</span>
+                </div>
+                
+                <div class="section-item exam">
+                    <span class="check-icon empty">○</span>
+                    <span class="section-number">📝</span>
+                    <span class="section-title">Ujian Akhir</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="section-content">
+            <!-- Header -->
+            <header class="content-header">
+                <div class="header-info">
+                    <h1>Section 4 dari 6</h1>
+                    <p class="subtitle">Sed Do Eiusmod</p>
+                </div>
+                <!-- 
+                    [DATABASE: section_progress]
+                    Progress bar berdasarkan jumlah section yang sudah completed
+                    Hitung: (completed_sections / total_sections) * 100
+                -->
+                <div class="progress-bar-header">
+                    <div class="progress-fill-header" style="width: 60%"></div>
+                </div>
+            </header>
+
+            <!-- Section Type: Text -->
+            <section class="section-box" id="section-text">
+                <div class="section-header-icon text-icon">
+                    <span>📄</span>
+                    <h2>Section Teks</h2>
+                </div>
+                <div class="section-body">
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>
+                    
+                    <h3>Lorem Ipsum Dolor</h3>
+                    <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident.</p>
+                    
+                    <h4>Consectetur Adipiscing</h4>
+                    <ul>
+                        <li>Lorem ipsum dolor sit amet consectetur</li>
+                        <li>Adipiscing elit sed do eiusmod tempor</li>
+                        <li>Incididunt ut labore et dolore magna</li>
+                        <li>Aliqua ut enim ad minim veniam</li>
+                    </ul>
+                    
+                    <div class="tips-box">
+                        <span class="tips-icon">💡</span>
+                        <div>
+                            <strong>Tips Lorem</strong>
+                            <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium.</p>
+                        </div>
+                    </div>
+                    
+                    <h4>Dolor Sit Amet</h4>
+                    <p>Totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
+                </div>
+            </section>
+
+            <!-- Section Type: Image -->
+            <section class="section-box hidden" id="section-image">
+                <div class="section-header-icon image-icon">
+                    <span>🖼️</span>
+                    <h2>Section Gambar</h2>
+                </div>
+                <div class="section-body">
+                    <p>Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt.</p>
+                    
+                    <div class="image-placeholder">
+                        <span>[ Gambar Placeholder ]</span>
+                    </div>
+                    
+                    <h4>Lorem Ipsum - Dolor Sit Amet</h4>
+                    <p>Consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                </div>
+            </section>
+
+            <!-- Section Type: Video -->
+            <section class="section-box hidden" id="section-video">
+                <div class="section-header-icon video-icon">
+                    <span>▶️</span>
+                    <h2>Section Video</h2>
+                </div>
+                <div class="section-body">
+                    <p>Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor.</p>
+                    
+                    <div class="video-placeholder">
+                        <div class="play-button">▶</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section Type: Audio -->
+            <section class="section-box hidden" id="section-audio">
+                <div class="section-header-icon audio-icon">
+                    <span>🎧</span>
+                    <h2>Section Audio</h2>
+                </div>
+                <div class="section-body">
+                    <p>Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt.</p>
+                    
+                    <div class="audio-item">
+                        <div class="audio-icon">▶</div>
+                        <div class="audio-info">
+                            <h4>Lorem Ipsum - Dolor Sit</h4>
+                            <p>Consectetur adipiscing elit sed do eiusmod.</p>
+                        </div>
+                        <div class="audio-duration">3:25</div>
+                        <button class="repeat-btn">🔁</button>
+                    </div>
+                    
+                    <div class="audio-item">
+                        <div class="audio-icon">▶</div>
+                        <div class="audio-info">
+                            <h4>Amet Consectetur - Adipiscing</h4>
+                            <p>Tempor incididunt ut labore et dolore magna.</p>
+                        </div>
+                        <div class="audio-duration">5:10</div>
+                        <button class="repeat-btn">🔁</button>
+                    </div>
+                    
+                    <div class="audio-item">
+                        <div class="audio-icon">▶</div>
+                        <div class="audio-info">
+                            <h4>Sed Do - Eiusmod Tempor</h4>
+                            <p>Incididunt ut labore et dolore.</p>
+                        </div>
+                        <div class="audio-duration">4:32</div>
+                        <button class="repeat-btn">🔁</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section Type: Combination -->
+            <section class="section-box hidden" id="section-combo">
+                <div class="section-header-icon combo-icon">
+                    <span>📚</span>
+                    <h2>Section Kombinasi</h2>
+                </div>
+                <div class="section-body">
+                    <p>Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                    
+                    <h4>📖 Lorem Ipsum Dolor Sit Amet</h4>
+                    <p>Consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua ut enim ad minim veniam.</p>
+                    
+                    <div class="combo-grid">
+                        <div class="combo-card blue">
+                            <span class="combo-emoji">👋</span>
+                            <h5>Lorem Ipsum</h5>
+                            <p>Dolor sit amet</p>
+                            <button class="listen-btn">🔊 Consectetur</button>
+                        </div>
+                        
+                        <div class="combo-card green">
+                            <span class="combo-emoji">🙏</span>
+                            <h5>Adipiscing Elit</h5>
+                            <p>Sed do eiusmod</p>
+                            <button class="listen-btn">🔊 Consectetur</button>
+                        </div>
+                        
+                        <div class="combo-card orange">
+                            <span class="combo-emoji">🙌</span>
+                            <h5>Tempor Incididunt</h5>
+                            <p>Ut labore et</p>
+                            <button class="listen-btn">🔊 Consectetur</button>
+                        </div>
+                        
+                        <div class="combo-card purple">
+                            <span class="combo-emoji">👏</span>
+                            <h5>Dolore Magna</h5>
+                            <p>Aliqua ut enim</p>
+                            <button class="listen-btn">🔊 Consectetur</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section Type: Interactive Quiz -->
+            <section class="section-box hidden" id="section-quiz">
+                <div class="section-header-icon quiz-icon">
+                    <span>🎮</span>
+                    <h2>Pembelajaran Interaktif</h2>
+                </div>
+                <div class="section-body">
+                    <p class="subtitle-text">Lorem Ipsum - Dolor sit amet consectetur!</p>
+                    
+                    <div class="quiz-progress">
+                        <span>Pertanyaan 1 dari 4</span>
+                        <span>Skor: 0</span>
+                    </div>
+                    <div class="quiz-progress-bar">
+                        <div class="quiz-progress-fill" style="width: 25%"></div>
+                    </div>
+                    
+                    <div class="quiz-question">
+                        <p>Lorem ipsum dolor sit amet consectetur adipiscing elit?</p>
+                    </div>
+                    
+                    <div class="quiz-options">
+                        <button class="quiz-option">
+                            <span class="option-label">A</span>
+                            <span>Dolor Sit</span>
+                        </button>
+                        <button class="quiz-option">
+                            <span class="option-label">B</span>
+                            <span>Amet Consectetur</span>
+                        </button>
+                        <button class="quiz-option">
+                            <span class="option-label">C</span>
+                            <span>Adipiscing Elit</span>
+                        </button>
+                        <button class="quiz-option">
+                            <span class="option-label">D</span>
+                            <span>Sed Do Eiusmod</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section Type: Final Exam -->
+            <section class="section-box hidden" id="section-exam">
+                <div class="exam-header">
+                    <h1>Ujian Akhir</h1>
+                    <p>Soal 1 dari 10</p>
+                    <!-- 
+                        [DATABASE: exam_results]
+                        Tampilkan nilai jika sudah mengerjakan
+                        Query: SELECT score, total_questions, correct_answers 
+                               FROM exam_results 
+                               WHERE user_id = ? AND course_id = ?
+                    -->
+                    <span class="exam-score">Terjawab: 0/10</span>
+                </div>
+                
+                <div class="exam-progress-bar">
+                    <div class="exam-progress-fill" style="width: 10%"></div>
+                </div>
+                
+                <div class="exam-question-box">
+                    <h3>Lorem ipsum dolor sit amet consectetur?</h3>
+                </div>
+                
+                <div class="exam-options">
+                    <button class="exam-option">
+                        <span class="option-label">A</span>
+                        <span>Dolor Sit Amet</span>
+                    </button>
+                    <button class="exam-option">
+                        <span class="option-label">B</span>
+                        <span>Consectetur Adipiscing</span>
+                    </button>
+                    <button class="exam-option">
+                        <span class="option-label">C</span>
+                        <span>Elit Sed Do</span>
+                    </button>
+                    <button class="exam-option">
+                        <span class="option-label">D</span>
+                        <span>Eiusmod Tempor</span>
+                    </button>
+                </div>
+                
+                <div class="exam-navigation">
+                    <button class="exam-nav-btn prev">← Sebelumnya</button>
+                    <div class="exam-number-grid">
+                        <button class="exam-number active">1</button>
+                        <button class="exam-number">2</button>
+                        <button class="exam-number">3</button>
+                        <button class="exam-number">4</button>
+                        <button class="exam-number">5</button>
+                        <button class="exam-number">6</button>
+                        <button class="exam-number">7</button>
+                        <button class="exam-number">8</button>
+                        <button class="exam-number">9</button>
+                        <button class="exam-number">10</button>
+                    </div>
+                    <button class="exam-nav-btn next">Selanjutnya →</button>
+                </div>
+            </section>
+
+            <!-- Navigation Buttons -->
+            <div class="content-navigation">
+                <button class="nav-btn prev-btn" disabled>← Section Sebelumnya</button>
+                <button class="nav-btn next-btn">Section Selanjutnya →</button>
+            </div>
+        </main>
+    </div>
+
+    <script src="tes.js"></script>
+</body>
+</html>
