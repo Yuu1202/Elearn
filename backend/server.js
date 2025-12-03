@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const path = require('path');
 
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
@@ -14,6 +15,12 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// ⚡️ PERBAIKAN: Melayani seluruh folder frontend (index.html, login.html, css/ dll.)
+app.use(express.static(path.join(__dirname, '..', 'frontend')));
+
+// Serve course files statically (Baris ini sudah benar)
+app.use('/courses', express.static(path.join(__dirname, '../frontend/courses')));
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI)
@@ -35,5 +42,5 @@ app.get('/', (req, res) => {
 // Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });

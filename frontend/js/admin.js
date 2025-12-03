@@ -33,7 +33,8 @@ function showTab(tabName) {
   tabs.forEach(tab => tab.classList.remove('active'));
   contents.forEach(content => content.classList.remove('active'));
   
-  event.target.classList.add('active');
+  // event.target is used here, ensure the function is called via onclick
+  event.target.classList.add('active'); 
   document.getElementById(`${tabName}Tab`).classList.add('active');
   
   if (tabName === 'courses') {
@@ -53,7 +54,7 @@ function hideCreateCourseForm() {
   document.getElementById('courseForm').reset();
 }
 
-// Create course - NEW FORMAT
+// Create course - REFACTOR: Hanya kirim data minimal!
 document.getElementById('courseForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   
@@ -70,18 +71,7 @@ document.getElementById('courseForm').addEventListener('submit', async (e) => {
   };
   const badgeType = badgeTypeMap[difficulty];
   
-  // Get metadata
-  const totalSections = parseInt(document.getElementById('totalSections').value);
-  const totalQuizzes = parseInt(document.getElementById('totalQuizzes').value);
-  const sectionIds = document.getElementById('sectionIds').value.split(',').map(s => s.trim()).filter(Boolean);
-  const quizIds = document.getElementById('quizIds').value.split(',').map(s => s.trim()).filter(Boolean);
-  
-  // Get course code
-  const courseCode = {
-    html: document.getElementById('courseHTML').value,
-    css: document.getElementById('courseCSS').value,
-    js: document.getElementById('courseJS').value
-  };
+  // Hapus pengambilan courseCode dan metadata (karena kini di-generate backend)
   
   try {
     const response = await fetch(`${API_URL}/courses`, {
@@ -95,14 +85,8 @@ document.getElementById('courseForm').addEventListener('submit', async (e) => {
         description,
         thumbnail: thumbnail || 'https://via.placeholder.com/300x200',
         difficulty,
-        badgeType,
-        courseCode,
-        metadata: {
-          totalSections,
-          totalQuizzes,
-          sectionIds,
-          quizIds
-        }
+        badgeType
+        // courseCode dan metadata dihapus dari payload
       })
     });
     
@@ -110,7 +94,7 @@ document.getElementById('courseForm').addEventListener('submit', async (e) => {
       throw new Error('Failed to create course');
     }
     
-    alert('Course created successfully!');
+    alert('Course created successfully! Folder course telah digenerate di frontend/courses.');
     hideCreateCourseForm();
     loadCourses();
   } catch (error) {
@@ -133,7 +117,7 @@ async function loadCourses() {
   }
 }
 
-// Display courses
+// Display courses - REFACTOR: Metadata tidak lagi wajib ditampilkan
 function displayCourses(courses) {
   const list = document.getElementById('coursesList');
   
@@ -161,7 +145,7 @@ function displayCourses(courses) {
       </div>
       <p>${course.description}</p>
       <p style="font-size: 0.9rem; color: #7f8c8d;">
-        ${course.metadata?.totalSections || 0} sections • ${course.metadata?.totalQuizzes || 0} quizzes
+        Folder Course: <strong>/frontend/courses/${course.courseFolder || 'N/A'}</strong>
       </p>
     </div>
   `).join('');
@@ -189,7 +173,7 @@ async function togglePublish(courseId, isPublished) {
 
 // Delete course
 async function deleteCourse(courseId) {
-  if (!confirm('Are you sure you want to delete this course?')) {
+  if (!confirm('Are you sure you want to delete this course and its associated folder/files?')) {
     return;
   }
   
@@ -203,7 +187,7 @@ async function deleteCourse(courseId) {
       throw new Error('Failed to delete course');
     }
     
-    alert('Course deleted successfully!');
+    alert('Course and its folder deleted successfully!');
     loadCourses();
   } catch (error) {
     console.error('Error deleting course:', error);

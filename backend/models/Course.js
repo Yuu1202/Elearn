@@ -23,33 +23,11 @@ const courseSchema = new mongoose.Schema({
     enum: ['bronze', 'silver', 'gold'],
     default: 'bronze'
   },
-  // Course is a full standalone app (HTML/CSS/JS)
-  courseCode: {
-    html: {
-      type: String,
-      default: ''
-    },
-    css: {
-      type: String,
-      default: ''
-    },
-    js: {
-      type: String,
-      default: ''
-    }
-  },
-  // Metadata about sections and quizzes for progress tracking
-  metadata: {
-    totalSections: {
-      type: Number,
-      default: 0
-    },
-    totalQuizzes: {
-      type: Number,
-      default: 0
-    },
-    sectionIds: [String], // e.g., ['section_1', 'section_2']
-    quizIds: [String] // e.g., ['quiz_1', 'quiz_2']
+  // Path folder course di frontend (misal: 'html-basic')
+  courseFolder: { 
+    type: String,
+    required: true
+    // e.g., 'html-basic'
   },
   isPublished: {
     type: Boolean,

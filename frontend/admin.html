@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <!-- Navbar -->
   <nav class="navbar">
     <div class="container">
       <div class="nav-brand">
@@ -22,7 +21,6 @@
     </div>
   </nav>
 
-  <!-- Admin Panel -->
   <section class="admin-section">
     <div class="container">
       <div class="admin-tabs">
@@ -30,55 +28,27 @@
         <button class="tab-btn" onclick="showTab('users')">Users</button>
       </div>
 
-      <!-- Courses Tab -->
       <div id="coursesTab" class="tab-content active">
         <h2>Course Management</h2>
         <button onclick="showCreateCourseForm()" class="btn-primary">+ Create New Course</button>
         
         <div id="createCourseForm" style="display:none;" class="form-container">
-          <h3>Create Course</h3>
+          <h3>Create Course (Template-Based)</h3>
           <form id="courseForm">
-            <input type="text" id="courseTitle" placeholder="Course Title" required>
+            <input type="text" id="courseTitle" placeholder="Course Title (Digunakan untuk membuat folder: slug-course-title)" required>
             <textarea id="courseDescription" placeholder="Description" required></textarea>
-            <input type="url" id="courseThumbnail" placeholder="Thumbnail URL">
+            <input type="url" id="courseThumbnail" placeholder="Thumbnail URL (Opsional)">
             
             <select id="courseDifficulty" required>
-              <option value="">Select Difficulty</option>
+              <option value="">Select Difficulty / Badge</option>
               <option value="beginner">Beginner (Bronze Badge)</option>
               <option value="intermediate">Intermediate (Silver Badge)</option>
               <option value="advanced">Advanced (Gold Badge)</option>
             </select>
 
-            <h4>Course Metadata</h4>
-            <input type="number" id="totalSections" placeholder="Total Sections" min="0" required>
-            <input type="number" id="totalQuizzes" placeholder="Total Quizzes" min="0" required>
-            <input type="text" id="sectionIds" placeholder="Section IDs (comma separated, e.g., section_1,section_2)">
-            <input type="text" id="quizIds" placeholder="Quiz IDs (comma separated, e.g., quiz_1,quiz_2)">
-
-            <h4>Course Code</h4>
-            <p style="color: #7f8c8d; font-size: 0.9rem;">Upload the full HTML/CSS/JS code for your interactive course app.</p>
-            
-            <label>HTML Code:</label>
-            <textarea id="courseHTML" placeholder="Paste HTML code here..." style="min-height: 200px; font-family: monospace;"></textarea>
-            
-            <label>CSS Code:</label>
-            <textarea id="courseCSS" placeholder="Paste CSS code here..." style="min-height: 200px; font-family: monospace;"></textarea>
-            
-            <label>JavaScript Code:</label>
-            <textarea id="courseJS" placeholder="Paste JavaScript code here..." style="min-height: 200px; font-family: monospace;"></textarea>
-
-            <div style="background: #e8f5e9; padding: 15px; border-radius: 8px; margin: 15px 0;">
-              <h5 style="margin-top: 0;">📘 Course API Reference</h5>
-              <p style="font-size: 0.9rem;">Your course JavaScript can use these functions:</p>
-              <code style="display: block; background: white; padding: 10px; border-radius: 5px; margin-top: 10px;">
-                // Mark section as complete<br>
-                courseAPI.markSectionComplete('section_1');<br><br>
-                // Submit quiz score (0-100)<br>
-                courseAPI.submitQuiz('quiz_1', 85);<br><br>
-                // Get current progress<br>
-                const progress = courseAPI.getProgress();
-              </code>
-            </div>
+            <p style="background: #e8f5e9; padding: 10px; border-radius: 5px; font-size: 0.9rem;">
+              ⚠️ Konten Course (3 Section + 1 Quiz) akan **otomatis dibuat** dari template di backend.
+            </p>
 
             <button type="submit" class="btn-primary">Create Course</button>
             <button type="button" onclick="hideCreateCourseForm()">Cancel</button>
@@ -86,16 +56,13 @@
         </div>
 
         <div id="coursesList" class="courses-list">
-          <!-- Courses will be loaded here -->
-        </div>
+          </div>
       </div>
 
-      <!-- Users Tab -->
       <div id="usersTab" class="tab-content">
         <h2>User Management</h2>
         <div id="usersList" class="users-list">
-          <!-- Users will be loaded here -->
-        </div>
+          </div>
       </div>
     </div>
   </section>

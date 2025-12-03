@@ -27,6 +27,8 @@ function updateNavbar() {
     
     if (user.role === 'admin') {
       adminLink.style.display = 'block';
+    } else {
+      adminLink.style.display = 'none';
     }
   } else {
     loginLink.style.display = 'block';
@@ -43,32 +45,48 @@ document.getElementById('logoutBtn')?.addEventListener('click', () => {
   window.location.href = 'login.html';
 });
 
-// Load courses
+// Load courses 
 async function loadCourses() {
+  let courses;
+  let userProgress = [];
+
   try {
+    // 1. AMBIL DAFTAR KURSUS UTAMA
     const response = await fetch(`${API_URL}/courses`);
-    const courses = await response.json();
+    if (!response.ok) {
+      throw new Error(`Failed to fetch courses: ${response.status} ${response.statusText}`);
+    }
+    courses = await response.json();
     
     const token = getToken();
-    let userProgress = [];
-    
+
+    // 2. AMBIL PROGRESS PENGGUNA (Diisolasi dari kegagalan otentikasi)
     if (token) {
       const progressRes = await fetch(`${API_URL}/progress/user`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
+      
       if (progressRes.ok) {
         userProgress = await progressRes.json();
+      } else if (progressRes.status === 401) {
+        console.warn('Token expired or invalid. Logging out silently.');
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        updateNavbar();
+      } else {
+        console.warn(`Could not load user progress: ${progressRes.statusText}. Continuing without progress data.`);
       }
     }
     
+    // 3. TAMPILKAN KURSUS
     displayCourses(courses, userProgress);
   } catch (error) {
-    console.error('Error loading courses:', error);
-    document.getElementById('coursesGrid').innerHTML = '<p class="empty-state">Failed to load courses</p>';
+    console.error('CRITICAL Error loading courses list:', error);
+    document.getElementById('coursesGrid').innerHTML = '<p class="empty-state">Failed to load courses. Please check API server status.</p>';
   }
 }
 
-// Display courses
+// Display courses - PERBAIKAN DI SINI! Menambahkan p.courseId &&
 function displayCourses(courses, userProgress) {
   const grid = document.getElementById('coursesGrid');
   
@@ -78,7 +96,8 @@ function displayCourses(courses, userProgress) {
   }
   
   grid.innerHTML = courses.map(course => {
-    const progress = userProgress.find(p => p.courseId._id === course._id);
+    // FIX: Pastikan p.courseId tidak null (karena course mungkin sudah dihapus)
+    const progress = userProgress.find(p => p.courseId && p.courseId._id === course._id);
     const progressPercent = progress ? progress.progressPercentage : 0;
     const isCompleted = progress ? progress.isCompleted : false;
     
@@ -102,11 +121,15 @@ function displayCourses(courses, userProgress) {
   }).join('');
 }
 
-// Open course detail modal
+// Open course detail modal (popup with detail + comments)
 async function openCourseDetail(courseId) {
   try {
     const response = await fetch(`${API_URL}/courses/${courseId}`);
-    const course = await response.json();
+    const course = await response.json(); // Course object contains 'courseFolder'
+
+    if (!course.courseFolder) {
+        throw new Error('Course folder path not found');
+    }
     
     const token = getToken();
     let progress = null;
@@ -116,19 +139,25 @@ async function openCourseDetail(courseId) {
         const progressRes = await fetch(`${API_URL}/progress/course/${courseId}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
+        
         if (progressRes.ok) {
           progress = await progressRes.json();
         } else {
-          // Start progress if not exists
+          // Jika progress belum dimulai atau token invalid, kita coba ambil progress awal
           const startRes = await fetch(`${API_URL}/progress/start`, {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ courseId })
+            body: JSON.stringify({ courseId }) 
           });
-          progress = await startRes.json();
+          if (startRes.ok) {
+            progress = await startRes.json();
+          } else if (startRes.status === 401) {
+            console.warn('Token expired or invalid during progress check. Please log in again.');
+            // Biarkan progress=null, modal akan menampilkan "Login to Start"
+          }
         }
       } catch (err) {
         console.error('Progress error:', err);
@@ -139,156 +168,140 @@ async function openCourseDetail(courseId) {
     document.getElementById('courseModal').style.display = 'block';
   } catch (error) {
     console.error('Error loading course:', error);
-    alert('Failed to load course details');
+    alert('Failed to load course details. Make sure course folder is generated and API is running.');
   }
 }
 
-// Display course detail - Render as iframe
+// Display course detail in popup
 function displayCourseDetail(course, progress) {
   const detail = document.getElementById('courseDetail');
   const token = getToken();
   
-  // Create full HTML document for iframe
-  const courseHTML = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <style>${course.courseCode.css}</style>
-    </head>
-    <body>
-      ${course.courseCode.html}
-      <script>
-        // API functions available to course
-        const courseAPI = {
-          markSectionComplete: function(sectionId) {
-            window.parent.postMessage({
-              type: 'SECTION_COMPLETE',
-              sectionId: sectionId
-            }, '*');
-          },
-          submitQuiz: function(quizId, score) {
-            window.parent.postMessage({
-              type: 'QUIZ_SUBMIT',
-              quizId: quizId,
-              score: score
-            }, '*');
-          },
-          getProgress: function() {
-            return ${JSON.stringify(progress)};
-          }
-        };
-        
-        // Course's custom JavaScript
-        ${course.courseCode.js}
-      <\/script>
-    </body>
-    </html>
-  `;
-  
+  // URL untuk tombol "Mulai"
+  const coursePath = `/courses/${course.courseFolder}/index.html`;
+
   detail.innerHTML = `
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-      <div>
+    <div style="display: flex; gap: 30px;">
+      <div style="flex: 1;">
+        <img src="${course.thumbnail}" alt="${course.title}" style="width: 100%; border-radius: 10px; margin-bottom: 20px;">
         <h2>${course.title}</h2>
-        <p>${course.description}</p>
+        <p style="color: #7f8c8d; margin: 15px 0;">${course.description}</p>
         <span class="difficulty-badge difficulty-${course.difficulty}">${course.difficulty}</span>
+        
+        ${progress ? `
+          <div style="margin: 20px 0;">
+            <h4>Your Progress</h4>
+            <div class="progress-bar-container">
+              <div class="progress-bar" style="width: ${progress.progressPercentage}%"></div>
+            </div>
+            <p style="margin-top: 10px;">${progress.progressPercentage}% Complete</p>
+          </div>
+        ` : ''}
+        
+        ${token ? `
+          <button onclick="startCourse('${coursePath}')" class="btn-primary" style="width: 100%; margin-top: 20px; padding: 15px; font-size: 1.1rem;">
+            ${progress && progress.progressPercentage > 0 ? '▶️ Continue Learning' : '🚀 Start Learning'}
+          </button>
+        ` : `
+          <a href="login.html" class="btn-primary" style="display: block; text-align: center; width: 100%; margin-top: 20px; padding: 15px; font-size: 1.1rem; text-decoration: none;">
+            🔒 Login to Start
+          </a>
+        `}
       </div>
-      ${progress ? `
-        <div style="text-align: right;">
-          <div style="font-size: 2rem; font-weight: bold; color: #3498db;">${progress.progressPercentage}%</div>
-          <div style="font-size: 0.9rem; color: #7f8c8d;">Progress</div>
-        </div>
-      ` : ''}
+      
+      <div style="flex: 1;">
+        <h3>💬 Comments</h3>
+        <div id="commentsList" style="max-height: 400px; overflow-y: auto; margin-bottom: 20px;">
+          </div>
+        
+        ${token ? `
+          <div class="comment-form">
+            <textarea id="commentInput" placeholder="Write your comment..." style="width: 100%; min-height: 80px;"></textarea>
+            <button onclick="submitComment('${course._id}')" style="margin-top: 10px;">Post Comment</button>
+          </div>
+        ` : '<p style="text-align: center; color: #7f8c8d;">Login to comment</p>'}
+      </div>
     </div>
-    
-    ${!token ? '<p style="background: #fff3cd; padding: 15px; border-radius: 8px; text-align: center;">⚠️ Login to track your progress and earn badges!</p>' : ''}
-    
-    <iframe 
-      id="courseFrame" 
-      style="width: 100%; height: 600px; border: 1px solid #ecf0f1; border-radius: 8px;"
-      sandbox="allow-scripts allow-same-origin"
-      srcdoc="${courseHTML.replace(/"/g, '&quot;')}"
-    ></iframe>
   `;
   
-  // Listen for messages from iframe
-  window.currentCourseId = course._id;
+  loadComments(course._id);
 }
 
-// Listen for messages from course iframe
-window.addEventListener('message', async (event) => {
-  const { type, sectionId, quizId, score } = event.data;
-  
-  const token = getToken();
-  if (!token) {
-    alert('Please login first');
-    return;
-  }
-  
-  if (type === 'SECTION_COMPLETE') {
-    try {
-      const response = await fetch(`${API_URL}/progress/section`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ 
-          courseId: window.currentCourseId, 
-          sectionId 
-        })
-      });
-      
-      const data = await response.json();
-      
-      if (data.badgeEarned) {
-        showBadgeModal(data.badgeEarned);
-      }
-      
-      // Refresh course detail to show updated progress
-      openCourseDetail(window.currentCourseId);
-    } catch (error) {
-      console.error('Error marking section:', error);
-    }
-  } else if (type === 'QUIZ_SUBMIT') {
-    try {
-      const response = await fetch(`${API_URL}/progress/quiz`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          courseId: window.currentCourseId,
-          quizId,
-          score
-        })
-      });
-      
-      const data = await response.json();
-      
-      alert(`Quiz Result:\nScore: ${data.score}%\nStatus: ${data.passed ? 'PASSED ✅' : 'FAILED ❌'}`);
-      
-      if (data.badgeEarned) {
-        showBadgeModal(data.badgeEarned);
-      }
-      
-      // Refresh course detail
-      openCourseDetail(window.currentCourseId);
-    } catch (error) {
-      console.error('Error submitting quiz:', error);
-    }
-  }
-});
-
-// Remove old quiz/section functions (not needed anymore)
-// Course app handles its own UI and logic
+// Start course - Arahkan ke path course independen
+function startCourse(coursePath) {
+  // Buka halaman course independen di window yang sama
+  window.location.href = coursePath;
+}
 
 // Load comments
 async function loadComments(courseId) {
-  // Comments moved to separate tab if needed
-  // For now, courses handle their own comments internally
+  try {
+    const response = await fetch(`${API_URL}/comments/${courseId}`);
+    const comments = await response.json();
+    
+    const list = document.getElementById('commentsList');
+    
+    if (comments.length === 0) {
+      list.innerHTML = '<p class="empty-state">No comments yet. Be the first to comment!</p>';
+      return;
+    }
+    
+    list.innerHTML = comments.map(comment => `
+      <div class="comment-item">
+        <div class="comment-header">
+          <span class="comment-author">${comment.username || 'Anonymous'}</span>
+          <span class="comment-date">${new Date(comment.createdAt).toLocaleDateString()}</span>
+        </div>
+        <p>${comment.comment}</p>
+      </div>
+    `).join('');
+  } catch (error) {
+    console.error('Error loading comments:', error);
+    document.getElementById('commentsList').innerHTML = '<p class="empty-state">Failed to load comments.</p>';
+  }
+}
+
+// Submit comment
+async function submitComment(courseId) {
+  const token = getToken();
+  const input = document.getElementById('commentInput');
+  const comment = input.value.trim();
+  
+  if (!token) {
+    alert('Please log in to comment.');
+    return;
+  }
+
+  if (!comment) {
+    alert('Please write a comment');
+    return;
+  }
+  
+  try {
+    const response = await fetch(`${API_URL}/comments`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ courseId, comment })
+    });
+
+    if (response.status === 401) {
+       alert('Session expired. Please log in again.');
+       return;
+    }
+    
+    if (!response.ok) {
+        throw new Error('Failed to post comment');
+    }
+
+    input.value = '';
+    loadComments(courseId);
+  } catch (error) {
+    console.error('Error submitting comment:', error);
+    alert('Failed to post comment');
+  }
 }
 
 // Show badge modal
@@ -323,8 +336,12 @@ document.querySelector('.close')?.addEventListener('click', () => {
 
 window.onclick = function(event) {
   const modal = document.getElementById('courseModal');
+  const badgeModal = document.getElementById('badgeModal');
   if (event.target === modal) {
     modal.style.display = 'none';
+  }
+  if (event.target === badgeModal) {
+    badgeModal.style.display = 'none';
   }
 }
 

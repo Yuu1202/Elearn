@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{COURSE_TITLE}}</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header>
+    <h1>{{COURSE_TITLE}}</h1>
+    <div id="progress-display">Progress: 0%</div>
+  </header>
+
+  <main>
+    <section id="section_1" class="course-section">
+      <h2>1. Pengenalan</h2>
+      <p>Ini adalah konten pertama Anda. Jelaskan dasar-dasar topik di sini.</p>
+      <button onclick="markComplete('section_1')" class="complete-btn">Tandai Selesai: Section 1</button>
+      <span class="status" id="status_section_1"></span>
+    </section>
+    
+    <section id="section_2" class="course-section">
+      <h2>2. Konsep Inti</h2>
+      <p>Selami topik utama. Sertakan kode, gambar, atau contoh di sini.</p>
+      <button onclick="markComplete('section_2')" class="complete-btn">Tandai Selesai: Section 2</button>
+      <span class="status" id="status_section_2"></span>
+    </section>
+
+    <section id="section_3" class="course-section">
+      <h2>3. Topik Lanjutan</h2>
+      <p>Sediakan materi tambahan atau tips lanjutan untuk memperkaya pengetahuan siswa.</p>
+      <button onclick="markComplete('section_3')" class="complete-btn">Tandai Selesai: Section 3</button>
+      <span class="status" id="status_section_3"></span>
+    </section>
+
+    <section id="quiz_1" class="course-quiz">
+      <h2>Quiz Akhir</h2>
+      <div id="question-container">
+        <p>1. Apa hasil dari 2 + 2?</p>
+        <input type="radio" name="q1" value="3"> 3<br>
+        <input type="radio" name="q1" value="4"> 4<br>
+        <input type="radio" name="q1" value="5"> 5<br>
+        <button onclick="submitCourseQuiz()">Kirim Jawaban</button>
+      </div>
+      <div id="quiz-result"></div>
+    </section>
+  </main>
+
+  <script>
+    // Metadata ini akan digunakan oleh script.js
+    const COURSE_ID = '{{COURSE_ID}}';
+    const COURSE_SECTIONS = ['section_1', 'section_2', 'section_3'];
+    const COURSE_QUIZZES = ['quiz_1'];
+    
+    // Jawaban quiz (untuk keperluan contoh template)
+    const QUIZ_ANSWERS = {
+      'q1': '4'
+    };
+  </script>
+  <script src="script.js"></script>
+</body>
+</html>
