@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile - E-Learning</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="container">
+      <div class="nav-brand">
+        <h2>📚 E-Learning</h2>
+      </div>
+      <div class="nav-menu">
+        <a href="index.html">Home</a>
+        <a href="profile.html">Profile</a>
+        <a href="admin.html" id="adminLink" style="display:none;">Admin</a>
+        <button id="logoutBtn">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Profile Section -->
+  <section class="profile-section">
+    <div class="container">
+      <div class="profile-header">
+        <h1 id="profileUsername">Loading...</h1>
+        <p id="profileEmail">Loading...</p>
+      </div>
+
+      <!-- Badges Section -->
+      <div class="badges-section">
+        <h2>🎖 My Badges</h2>
+        <div id="badgesGrid" class="badges-grid">
+          <!-- Badges will be loaded here -->
+        </div>
+      </div>
+
+      <!-- Progress Section -->
+      <div class="progress-section">
+        <h2>📊 My Progress</h2>
+        <div id="progressList" class="progress-list">
+          <!-- Progress will be loaded here -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="js/profile.js"></script>
+</body>
+</html>

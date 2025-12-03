@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>E-Learning Platform</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="container">
+      <div class="nav-brand">
+        <h2>📚 E-Learning</h2>
+      </div>
+      <div class="nav-menu" id="navMenu">
+        <a href="index.html">Home</a>
+        <a href="profile.html" id="profileLink" style="display:none;">Profile</a>
+        <a href="admin.html" id="adminLink" style="display:none;">Admin</a>
+        <a href="login.html" id="loginLink">Login</a>
+        <button id="logoutBtn" style="display:none;">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <h1>Welcome to E-Learning Platform</h1>
+      <p>Learn new skills, earn badges, and become a master!</p>
+    </div>
+  </section>
+
+  <!-- Courses Section -->
+  <section class="courses-section">
+    <div class="container">
+      <h2>Available Courses</h2>
+      <div id="coursesGrid" class="courses-grid">
+        <!-- Courses will be loaded here -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Course Detail Modal -->
+  <div id="courseModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <div id="courseDetail">
+        <!-- Course detail will be loaded here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Badge Earned Modal -->
+  <div id="badgeModal" class="modal">
+    <div class="modal-content badge-popup">
+      <h2>🎉 Badge Earned!</h2>
+      <div id="badgeContent"></div>
+      <button onclick="closeBadgeModal()">Awesome!</button>
+    </div>
+  </div>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
