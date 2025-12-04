@@ -1,106 +1,160 @@
 const express = require('express');
 const Course = require('../models/Course');
 const { auth, adminAuth } = require('../middleware/auth');
-const fs = require('fs-extra');
-const path = require('path');
+const fs = require('fs-extra'); // WAJIB
+const path = require('path');   // WAJIB
 
 const router = express.Router();
 
-// Helper function to create URL-friendly slug
+// Helper function to create URL-friendly slug (courseFolder)
 const slugify = (text) => {
   return text
     .toLowerCase()
     .trim()
-    .replace(/[^\w\s-]/g, '') // Remove non-word characters (except space/hyphen)
-    .replace(/[\s_-]+/g, '-') // Collapse whitespace and underscores to a single hyphen
-    .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
+    .replace(/[^\w\s-]/g, '') 
+    .replace(/[\s_-]+/g, '-')
+    .replace(/^-+|-+$/g, '');
 };
 
-// Directories
-const rootDir = path.resolve(__dirname, '../../');
-const coursesDestDir = path.join(rootDir, 'frontend/courses');
-const courseTemplateDir = path.join(__dirname, '../templates/course_template'); // Asumsi path template
+// 💡 Directories & Paths - KRUSIAL!
+// Menentukan Root Directory (project_root/)
+const rootDir = path.resolve(__dirname, '../../'); 
+const coursesDestDir = path.join(rootDir, 'frontend/courses'); 
 
-// Ensure destination directory exists
-fs.ensureDirSync(coursesDestDir);
+// Pastikan direktori tujuan kursus ada. fs-extra akan membuatnya jika belum ada.
+try {
+    fs.ensureDirSync(coursesDestDir);
+} catch (e) {
+    console.error(`❌ Gagal memastikan direktori ${coursesDestDir} ada. Cek izin akses.`);
+}
+
 
 /**
- * 💡 Fungsi untuk Menyalin & Mengubah File Template
- * Menjamin file-file course dibuat sesuai dengan data baru (title, id).
+ * Fungsi untuk Menyusun dan Menyimpan File HTML Statis
  */
-const generateCourseFiles = async (courseId, courseTitle) => {
+const generateCourseFiles = async (courseId, courseTitle, courseCode) => {
   const courseSlug = slugify(courseTitle);
-  const destPath = path.join(coursesDestDir, courseSlug);
-
-  // 1. Hapus folder lama jika ada (untuk PUT)
-  await fs.remove(destPath).catch(() => {});
-
-  // 2. Salin template ke folder baru
-  await fs.copy(courseTemplateDir, destPath);
-
-  // 3. Ubah placeholder di file index.html
+  const destPath = path.join(coursesDestDir, courseSlug); 
   const indexPath = path.join(destPath, 'index.html');
-  let htmlContent = await fs.readFile(indexPath, 'utf8');
 
-  // Ganti placeholder untuk judul dan ID kursus
-  htmlContent = htmlContent.replace('{{COURSE_TITLE}}', courseTitle);
-  htmlContent = htmlContent.replace('{{COURSE_ID}}', courseId.toString());
+  // 1. Hapus folder lama
+  await fs.remove(destPath).catch(() => {});
+  
+  // 2. Buat folder baru
+  await fs.ensureDir(destPath);
+  
+  // 3. Gabungkan HTML, CSS, dan JS menjadi satu file statis
+  const finalHtmlContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${courseTitle}</title>
+  <style>${courseCode?.css || ''}</style> 
+</head>
+<body>
+  ${courseCode?.html || `<h1>${courseTitle} - Konten belum diisi.</h1><p>Silakan isi kode HTML di halaman admin.</p>`}
+  <script>
+    // Konstanta krusial untuk script course
+    const COURSE_ID = '${courseId}';
+    
+    // JS dari courseCode.js
+    ${courseCode?.js || ''}
+  </script>
+</body>
+</html>`;
+      
+  // 4. Tulis konten ke index.html
+  try {
+    await fs.writeFile(indexPath, finalHtmlContent); 
+  } catch (writeError) {
+    console.error('❌ FATAL FILE WRITE ERROR in generateCourseFiles:', writeError);
+    console.error(`Attempted path: ${indexPath}`);
+    
+    // Melemparkan error yang lebih spesifik
+    throw new Error(`[Gagal Tulis File] Cek izin folder 'frontend/courses'. Path: ${indexPath}. Detail: ${writeError.message}`);
+  }
 
-  await fs.writeFile(indexPath, htmlContent);
-
-  return courseSlug; // Mengembalikan slug folder
+  return courseSlug; 
 };
 
-// CREATE course (Admin only) - Generate folder/files from template
+
+// ----------------------------------------------------
+// ROUTE CRUD DENGAN LOGIKA GENERASI FILE
+// ----------------------------------------------------
+
+// Create course (Admin only)
 router.post('/', adminAuth, async (req, res) => {
   try {
-    const { 
-      title, 
-      description, 
-      thumbnail, 
-      difficulty, 
-      badgeType
-      // Hapus courseCode, metadata
+    const { 
+      title, 
+      description, 
+      thumbnail, 
+      difficulty, 
+      badgeType, 
+      courseCode,
+      metadata 
     } = req.body;
 
-    const courseFolder = slugify(title);
-
-    // 1. Cek apakah folder dengan slug yang sama sudah ada
-    if (await fs.exists(path.join(coursesDestDir, courseFolder))) {
-       // Opsional: berikan nama unik jika sudah ada
-       // Untuk saat ini, kita anggap judul unik atau admin akan mengupdate yang sudah ada
-       // atau kita biarkan logic generateCourseFiles me-replace jika ada (tidak ideal untuk POST baru)
-       // Kita asumsikan slug unique untuk POST
+    // 1. Validasi Input Dasar (agar tidak ada error saat save)
+    if (!title) {
+        return res.status(400).json({ error: 'Course title is required.' });
     }
     
-    // 2. Buat course di database
+    // 2. Simpan ke Database
+    const courseFolder = slugify(title);
+
     const course = new Course({
       title,
       description,
       thumbnail,
       difficulty,
       badgeType,
-      courseFolder, // Simpan slug folder
+      courseFolder, 
+      courseCode: {
+        html: courseCode?.html || '',
+        css: courseCode?.css || '',
+        js: courseCode?.js || ''
+      },
+      metadata: {
+        totalSections: metadata?.totalSections || 0,
+        totalQuizzes: metadata?.totalQuizzes || 0,
+        sectionIds: metadata?.sectionIds || [],
+        quizIds: metadata?.quizIds || []
+      },
       createdBy: req.user._id,
       isPublished: false
     });
 
     await course.save();
 
-    // 3. Generate folder dan file dari template
-    await generateCourseFiles(course._id, title);
+    // 3. Generate files (Ini yang bisa melempar error)
+    await generateCourseFiles(course._id, title, courseCode);
 
     res.status(201).json(course);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    // 💡 FIX KRUSIAL: Tampilkan error yang lebih spesifik
+    console.error('Error in POST /api/courses:', error.message);
+    
+    let errorMessage = 'Failed to create course.';
+    if (error.message.includes('[Gagal Tulis File]')) {
+      // Kirim pesan yang detail dari generateCourseFiles
+      errorMessage = error.message; 
+    } else if (error.message.includes('Cast to ObjectId failed')) {
+      errorMessage = 'Data user ID tidak valid. Coba logout dan login lagi.';
+    } else {
+      errorMessage = `Failed to create course. Detail: ${error.message}`;
+    }
+
+    res.status(400).json({ error: errorMessage });
   }
 });
 
-// Get all published courses (select courseFolder field)
+// Get all published courses
 router.get('/', async (req, res) => {
   try {
     const courses = await Course.find({ isPublished: true })
-      .select('title description thumbnail difficulty badgeType courseFolder createdAt')
+      .select('title description thumbnail difficulty badgeType courseFolder createdAt') 
       .sort('-createdAt');
     res.json(courses);
   } catch (error) {
@@ -118,11 +172,10 @@ router.get('/all', adminAuth, async (req, res) => {
   }
 });
 
-// Get course by ID (for detail popup - select courseFolder field)
+// Get course by ID (with full code for rendering)
 router.get('/:id', async (req, res) => {
   try {
-    const course = await Course.findById(req.params.id)
-      .select('title description thumbnail difficulty badgeType courseFolder createdAt');
+    const course = await Course.findById(req.params.id);
     
     if (!course) {
       return res.status(404).json({ error: 'Course not found' });
@@ -134,47 +187,38 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// UPDATE course (Admin only) - Regenerate files
+// Update course (Admin only)
 router.put('/:id', adminAuth, async (req, res) => {
   try {
-    const { 
-      title, 
-      description, 
-      thumbnail, 
-      difficulty, 
-      badgeType, 
-      // Hapus courseCode, metadata
-    } = req.body;
+    const { title, courseCode } = req.body;
+    
+    const courseFolder = slugify(title);
 
-    const course = await Course.findById(req.params.id);
+    const course = await Course.findByIdAndUpdate(
+      req.params.id,
+      {
+        ...req.body, // Memudahkan update field lain
+        courseFolder, 
+        courseCode: {
+          html: courseCode?.html || '',
+          css: courseCode?.css || '',
+          js: courseCode?.js || ''
+        },
+        updatedAt: Date.now()
+      },
+      { new: true }
+    );
+
     if (!course) {
       return res.status(404).json({ error: 'Course not found' });
     }
     
-    // Tentukan slug folder baru
-    const newCourseFolder = slugify(title);
-    
-    // Hapus folder lama jika slug berubah
-    if (course.courseFolder && course.courseFolder !== newCourseFolder) {
-      const oldPath = path.join(coursesDestDir, course.courseFolder);
-      await fs.remove(oldPath).catch(() => console.error(`Failed to remove old dir: ${oldPath}`));
-    }
-    
-    // Update database
-    course.title = title;
-    course.description = description;
-    course.thumbnail = thumbnail;
-    course.difficulty = difficulty;
-    course.badgeType = badgeType;
-    course.courseFolder = newCourseFolder; // Update folder field
-    course.updatedAt = Date.now();
+    // Regenerate files setelah update
+    await generateCourseFiles(course._id, title, courseCode);
 
-    // Regenerate folder dan file dari template
-    await generateCourseFiles(course._id, title);
-
-    await course.save();
     res.json(course);
   } catch (error) {
+    console.error('Error in PUT /api/courses/:id:', error.message);
     res.status(400).json({ error: error.message });
   }
 });
@@ -183,7 +227,7 @@ router.put('/:id', adminAuth, async (req, res) => {
 router.put('/:id/publish', adminAuth, async (req, res) => {
   try {
     const course = await Course.findById(req.params.id);
-    
+    // ... (logic)
     if (!course) {
       return res.status(404).json({ error: 'Course not found' });
     }
@@ -200,23 +244,23 @@ router.put('/:id/publish', adminAuth, async (req, res) => {
 // DELETE course (Admin only) - Also delete folder/files
 router.delete('/:id', adminAuth, async (req, res) => {
   try {
-    const course = await Course.findById(req.params.id);
+    const course = await Course.findByIdAndDelete(req.params.id);
     
     if (!course) {
       return res.status(404).json({ error: 'Course not found' });
     }
 
-    // Delete course folder from frontend
+    // Hapus folder kursus dari frontend
     if (course.courseFolder) {
       const coursePath = path.join(coursesDestDir, course.courseFolder);
-      await fs.remove(coursePath).catch(err => console.error(`Error deleting course directory: ${err.message}`));
+      await fs.remove(coursePath)
+        .then(() => console.log(`Course folder deleted: ${coursePath}`))
+        .catch(err => console.warn(`Failed to delete course folder ${coursePath}: ${err.message}`));
     }
-
-    // Delete from database
-    await course.deleteOne();
-
+    
     res.json({ message: 'Course deleted successfully' });
   } catch (error) {
+    console.error('Error in DELETE /api/courses/:id:', error.message);
     res.status(400).json({ error: error.message });
   }
 });

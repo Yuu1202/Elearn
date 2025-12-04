@@ -122,28 +122,38 @@ function displayCourses(courses, userProgress) {
 }
 
 // Open course detail modal (popup with detail + comments)
+// Open course detail modal (popup with detail + comments)
 async function openCourseDetail(courseId) {
+  let course;
   try {
+    // 1. Ambil detail kursus utama (WAJIB)
     const response = await fetch(`${API_URL}/courses/${courseId}`);
-    const course = await response.json(); // Course object contains 'courseFolder'
+    if (!response.ok) {
+        // Jika fetch utama gagal (misal 404, 500, dll.)
+        throw new Error(`Failed to fetch course data: ${response.statusText}`);
+    }
+    course = await response.json(); 
 
     if (!course.courseFolder) {
-        throw new Error('Course folder path not found');
+        // Course folder field harus selalu ada di data kursus
+        throw new Error('Course folder path not found in database record'); 
     }
     
     const token = getToken();
     let progress = null;
     
+    // 2. Cek dan buat progress (KRUSIAL: Diisolasi dari error utama)
     if (token) {
-      try {
+      try { 
+        // a. Cek existing progress
         const progressRes = await fetch(`${API_URL}/progress/course/${courseId}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         
         if (progressRes.ok) {
           progress = await progressRes.json();
-        } else {
-          // Jika progress belum dimulai atau token invalid, kita coba ambil progress awal
+        } else if (progressRes.status === 404 || progressRes.status === 400) {
+          // b. Jika progress BELUM ADA (404/400), coba buat progress awal
           const startRes = await fetch(`${API_URL}/progress/start`, {
             method: 'POST',
             headers: {
@@ -152,21 +162,33 @@ async function openCourseDetail(courseId) {
             },
             body: JSON.stringify({ courseId }) 
           });
+          
           if (startRes.ok) {
             progress = await startRes.json();
           } else if (startRes.status === 401) {
-            console.warn('Token expired or invalid during progress check. Please log in again.');
-            // Biarkan progress=null, modal akan menampilkan "Login to Start"
+            console.warn('Token expired during start progress. User needs re-login.');
+          } else {
+            // Log error inisialisasi progress tanpa memblokir modal
+            console.error('Failed to initialize progress:', await startRes.text());
           }
+        } else if (progressRes.status === 401) {
+            console.warn('Token expired during progress check. User needs re-login.');
+        } else {
+            // Log error fetch progress yang lain
+            console.error('Failed to fetch progress with status:', progressRes.status, await progressRes.text());
         }
       } catch (err) {
-        console.error('Progress error:', err);
+        // Menangani error jaringan atau error parsing JSON di dalam blok progress
+        console.error('Network/Parsing error during progress fetching/starting:', err);
+        // Lanjutkan untuk menampilkan detail kursus tanpa data progress
       }
     }
     
+    // 3. Tampilkan modal detail (hanya butuh object 'course' yang sudah berhasil diambil)
     displayCourseDetail(course, progress);
     document.getElementById('courseModal').style.display = 'block';
   } catch (error) {
+    // 4. Tangani error utama (hanya jika GAGAL mengambil detail kursus)
     console.error('Error loading course:', error);
     alert('Failed to load course details. Make sure course folder is generated and API is running.');
   }
