@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Matematika Dasar - Algebra dan Geometri</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+      color: #333;
+    }
+
+    header {
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      padding: 20px 30px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    header h1 {
+      color: white;
+      font-size: 1.8em;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .back-btn {
+      background: white;
+      color: #4facfe;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 1em;
+      font-weight: bold;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .back-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+
+    #progress-display {
+      background: white;
+      padding: 10px 20px;
+      border-radius: 25px;
+      font-weight: bold;
+      color: #4facfe;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    main {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .course-section, .course-quiz {
+      background: white;
+      padding: 30px;
+      margin-bottom: 25px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      animation: slideUp 0.5s ease-out;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    h2 {
+      color: #4facfe;
+      margin-bottom: 20px;
+      font-size: 1.8em;
+      border-bottom: 3px solid #4facfe;
+      padding-bottom: 10px;
+    }
+
+    h3 {
+      color: #667eea;
+      margin-top: 20px;
+      margin-bottom: 10px;
+    }
+
+    p {
+      line-height: 1.8;
+      margin-bottom: 15px;
+      font-size: 1.05em;
+    }
+
+    ul, ol {
+      margin-left: 25px;
+      margin-bottom: 15px;
+      line-height: 1.8;
+    }
+
+    li {
+      margin-bottom: 8px;
+    }
+
+    .formula-box {
+      background: linear-gradient(135deg, #e0f7ff 0%, #f0f9ff 100%);
+      border-left: 5px solid #4facfe;
+      padding: 20px;
+      border-radius: 10px;
+      margin: 20px 0;
+      box-shadow: 0 4px 15px rgba(79, 172, 254, 0.2);
+    }
+
+    .formula-box h3 {
+      margin-top: 0;
+      color: #4facfe;
+    }
+
+    .example-box {
+      background: linear-gradient(135deg, #fff5e6 0%, #ffe6cc 100%);
+      border-left: 5px solid #ff9800;
+      padding: 20px;
+      border-radius: 10px;
+      margin: 20px 0;
+      box-shadow: 0 4px 15px rgba(255, 152, 0, 0.2);
+    }
+
+    .tip-box {
+      background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+      border-left: 5px solid #4caf50;
+      padding: 15px;
+      border-radius: 10px;
+      margin: 20px 0;
+      box-shadow: 0 4px 15px rgba(76, 175, 80, 0.2);
+    }
+
+    .complete-btn {
+      background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 1.1em;
+      font-weight: bold;
+      margin-top: 20px;
+      margin-right: 15px;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+    }
+
+    .complete-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+    }
+
+    .status {
+      font-weight: bold;
+      padding: 8px 15px;
+      border-radius: 20px;
+      display: inline-block;
+    }
+
+    .completed {
+      color: #4caf50;
+      background: #e8f5e9;
+    }
+
+    .incomplete {
+      color: #ff9800;
+      background: #fff3e0;
+    }
+
+    #question-container label {
+      display: block;
+      background: #f5f5f5;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: 2px solid transparent;
+    }
+
+    #question-container label:hover {
+      background: #e3f2fd;
+      border-color: #4facfe;
+    }
+
+    #question-container input[type="radio"] {
+      margin-right: 10px;
+    }
+
+    #question-container button {
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      color: white;
+      border: none;
+      padding: 15px 40px;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 1.2em;
+      font-weight: bold;
+      margin-top: 20px;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4);
+    }
+
+    #question-container button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(79, 172, 254, 0.5);
+    }
+
+    #quiz-result {
+      margin-top: 20px;
+      padding: 20px;
+      border-radius: 10px;
+      font-size: 1.1em;
+      font-weight: bold;
+    }
+
+    .quiz-passed {
+      background: #e8f5e9;
+      color: #4caf50;
+      border: 2px solid #4caf50;
+    }
+
+    .quiz-failed {
+      background: #ffebee;
+      color: #f44336;
+      border: 2px solid #f44336;
+    }
+
+    code {
+      background: #f5f5f5;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      color: #e91e63;
+    }
+
+    @media (max-width: 768px) {
+      header {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      header h1 {
+        font-size: 1.5em;
+      }
+
+      .course-section, .course-quiz {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <button onclick="goBack()" class="back-btn">⬅️ Kembali</button>
+      <h1>📐 Matematika Dasar - Algebra & Geometri</h1>
+    </div>
+    <div id="progress-display">Progres: 0%</div>
+  </header>
+
+  <main>
+    <!-- SECTION 1: Aljabar Dasar -->
+    <section id="section_1" class="course-section">
+      <h2>1. 🔢 Pengenalan Aljabar</h2>
+      
+      <p>Aljabar adalah cabang matematika yang menggunakan huruf (variabel) untuk mewakili angka yang belum diketahui. Aljabar sangat berguna dalam menyelesaikan masalah sehari-hari dan merupakan dasar dari matematika tingkat lanjut.</p>
+
+      <h3>Konsep Dasar Variabel</h3>
+      <p>Variabel adalah simbol (biasanya huruf seperti x, y, z) yang mewakili nilai yang dapat berubah atau belum diketahui. Contohnya:</p>
+      <ul>
+        <li><strong>x + 5 = 10</strong> → x adalah variabel yang nilainya 5</li>
+        <li><strong>2y = 8</strong> → y adalah variabel yang nilainya 4</li>
+        <li><strong>a + b = c</strong> → a, b, dan c semuanya variabel</li>
+      </ul>
+
+      <div class="formula-box">
+        <h3>📋 Operasi Dasar Aljabar</h3>
+        <ul>
+          <li><strong>Penjumlahan:</strong> x + y</li>
+          <li><strong>Pengurangan:</strong> x - y</li>
+          <li><strong>Perkalian:</strong> x × y atau xy</li>
+          <li><strong>Pembagian:</strong> x ÷ y atau x/y</li>
+        </ul>
+      </div>
+
+      <div class="example-box">
+        <h3>💡 Contoh Soal</h3>
+        <p><strong>Soal:</strong> Selesaikan persamaan 3x + 7 = 22</p>
+        <p><strong>Penyelesaian:</strong></p>
+        <ol>
+          <li>3x + 7 = 22</li>
+          <li>3x = 22 - 7</li>
+          <li>3x = 15</li>
+          <li>x = 15 ÷ 3</li>
+          <li>x = 5</li>
+        </ol>
+      </div>
+
+      <div class="tip-box">
+        <strong>💡 Tips:</strong> Untuk menyelesaikan persamaan, isolasikan variabel di satu sisi dengan melakukan operasi yang sama pada kedua sisi persamaan.
+      </div>
+
+      <button onclick="markComplete('section_1')" class="complete-btn">Tandai Selesai ✓</button>
+      <span class="status" id="status_section_1"></span>
+    </section>
+
+    <!-- SECTION 2: Geometri Dasar -->
+    <section id="section_2" class="course-section">
+      <h2>2. 📏 Geometri Dasar - Bangun Datar</h2>
+      
+      <p>Geometri adalah cabang matematika yang mempelajari bentuk, ukuran, posisi relatif, dan sifat ruang. Mari kita pelajari bangun datar yang paling umum dan rumusnya.</p>
+
+      <h3>Bangun Datar dan Rumusnya</h3>
+
+      <div class="formula-box">
+        <h3>🟦 Persegi Panjang</h3>
+        <p><strong>Luas:</strong> L = panjang × lebar</p>
+        <p><strong>Keliling:</strong> K = 2 × (panjang + lebar)</p>
+        <p><strong>Contoh:</strong> Persegi panjang dengan panjang 8 cm dan lebar 5 cm</p>
+        <ul>
+          <li>Luas = 8 × 5 = 40 cm²</li>
+          <li>Keliling = 2 × (8 + 5) = 26 cm</li>
+        </ul>
+      </div>
+
+      <div class="formula-box">
+        <h3>🟨 Persegi</h3>
+        <p><strong>Luas:</strong> L = sisi × sisi = s²</p>
+        <p><strong>Keliling:</strong> K = 4 × sisi</p>
+        <p><strong>Contoh:</strong> Persegi dengan sisi 6 cm</p>
+        <ul>
+          <li>Luas = 6² = 36 cm²</li>
+          <li>Keliling = 4 × 6 = 24 cm</li>
+        </ul>
+      </div>
+
+      <div class="formula-box">
+        <h3>🔺 Segitiga</h3>
+        <p><strong>Luas:</strong> L = ½ × alas × tinggi</p>
+        <p><strong>Keliling:</strong> K = sisi₁ + sisi₂ + sisi₃</p>
+        <p><strong>Contoh:</strong> Segitiga dengan alas 10 cm dan tinggi 6 cm</p>
+        <ul>
+          <li>Luas = ½ × 10 × 6 = 30 cm²</li>
+        </ul>
+      </div>
+
+      <div class="formula-box">
+        <h3>⭕ Lingkaran</h3>
+        <p><strong>Luas:</strong> L = π × r² (r = jari-jari)</p>
+        <p><strong>Keliling:</strong> K = 2 × π × r atau π × d (d = diameter)</p>
+        <p><strong>Catatan:</strong> π (pi) ≈ 3,14 atau 22/7</p>
+        <p><strong>Contoh:</strong> Lingkaran dengan jari-jari 7 cm</p>
+        <ul>
+          <li>Luas = 3,14 × 7² = 153,86 cm²</li>
+          <li>Keliling = 2 × 3,14 × 7 = 43,96 cm</li>
+        </ul>
+      </div>
+
+      <div class="tip-box">
+        <strong>💡 Tips:</strong> Untuk soal geometri, selalu gambar sketsa bangun tersebut dan tulis informasi yang diketahui. Ini akan membantu visualisasi dan menghindari kesalahan.
+      </div>
+
+      <button onclick="markComplete('section_2')" class="complete-btn">Tandai Selesai ✓</button>
+      <span class="status" id="status_section_2"></span>
+    </section>
+
+    <!-- SECTION 3: Pecahan dan Desimal -->
+    <section id="section_3" class="course-section">
+      <h2>3. ➗ Pecahan dan Desimal</h2>
+      
+      <p>Pecahan dan desimal adalah cara berbeda untuk menyatakan bagian dari keseluruhan. Memahami keduanya sangat penting dalam matematika.</p>
+
+      <h3>Pecahan</h3>
+      <p>Pecahan terdiri dari pembilang (angka atas) dan penyebut (angka bawah). Contoh: ¾ berarti 3 bagian dari 4 bagian total.</p>
+
+      <div class="formula-box">
+        <h3>📐 Operasi Pecahan</h3>
+        <p><strong>Penjumlahan/Pengurangan:</strong> Samakan penyebut terlebih dahulu</p>
+        <p>Contoh: ½ + ¼ = 2/4 + 1/4 = ¾</p>
+        
+        <p><strong>Perkalian:</strong> Kalikan pembilang dengan pembilang, penyebut dengan penyebut</p>
+        <p>Contoh: ½ × ¾ = (1×3)/(2×4) = 3/8</p>
+        
+        <p><strong>Pembagian:</strong> Balik pecahan kedua, lalu kalikan</p>
+        <p>Contoh: ½ ÷ ¼ = ½ × 4/1 = 4/2 = 2</p>
+      </div>
+
+      <h3>Desimal</h3>
+      <p>Desimal menggunakan titik untuk memisahkan bilangan bulat dari pecahan. Contoh: 0,5 = ½ dan 0,75 = ¾</p>
+
+      <div class="example-box">
+        <h3>💡 Konversi Pecahan ke Desimal</h3>
+        <p>Untuk mengubah pecahan ke desimal, bagi pembilang dengan penyebut:</p>
+        <ul>
+          <li>½ = 1 ÷ 2 = 0,5</li>
+          <li>¾ = 3 ÷ 4 = 0,75</li>
+          <li>⅕ = 1 ÷ 5 = 0,2</li>
+          <li>⅛ = 1 ÷ 8 = 0,125</li>
+        </ul>
+      </div>
+
+      <div class="example-box">
+        <h3>💡 Konversi Desimal ke Pecahan</h3>
+        <p>Untuk mengubah desimal ke pecahan:</p>
+        <ol>
+          <li>0,5 = 5/10 = ½ (sederhanakan)</li>
+          <li>0,25 = 25/100 = ¼ (sederhanakan)</li>
+          <li>0,6 = 6/10 = ⅗ (sederhanakan)</li>
+        </ol>
+      </div>
+
+      <div class="tip-box">
+        <strong>💡 Tips:</strong> Hafalkan beberapa konversi umum seperti ½ = 0,5, ¼ = 0,25, ¾ = 0,75, ⅓ = 0,333... untuk mempercepat perhitungan.
+      </div>
+
+      <button onclick="markComplete('section_3')" class="complete-btn">Tandai Selesai ✓</button>
+      <span class="status" id="status_section_3"></span>
+    </section>
+
+    <!-- QUIZ -->
+    <section id="quiz_1" class="course-quiz">
+      <h2>🏆 Quiz: Uji Pemahaman Matematika Dasar</h2>
+      
+      <div id="question-container">
+        <p><strong>1. Berapakah nilai x dalam persamaan 2x + 5 = 15?</strong></p>
+        <label><input type="radio" name="q1" value="3"> 3</label>
+        <label><input type="radio" name="q1" value="5"> 5</label>
+        <label><input type="radio" name="q1" value="10"> 10</label>
+        <label><input type="radio" name="q1" value="7"> 7</label>
+
+        <p><strong>2. Berapakah luas persegi dengan sisi 9 cm?</strong></p>
+        <label><input type="radio" name="q2" value="18"> 18 cm²</label>
+        <label><input type="radio" name="q2" value="36"> 36 cm²</label>
+        <label><input type="radio" name="q2" value="81"> 81 cm²</label>
+        <label><input type="radio" name="q2" value="45"> 45 cm²</label>
+
+        <p><strong>3. Persegi panjang memiliki panjang 12 cm dan lebar 8 cm. Berapakah kelilingnya?</strong></p>
+        <label><input type="radio" name="q3" value="20"> 20 cm</label>
+        <label><input type="radio" name="q3" value="40"> 40 cm</label>
+        <label><input type="radio" name="q3" value="96"> 96 cm</label>
+        <label><input type="radio" name="q3" value="32"> 32 cm</label>
+
+        <p><strong>4. Berapakah hasil dari ½ + ¼?</strong></p>
+        <label><input type="radio" name="q4" value="1/6"> 1/6</label>
+        <label><input type="radio" name="q4" value="3/4"> 3/4</label>
+        <label><input type="radio" name="q4" value="2/3"> 2/3</label>
+        <label><input type="radio" name="q4" value="1/2"> 1/2</label>
+
+        <p><strong>5. Konversikan desimal 0,75 ke dalam bentuk pecahan yang paling sederhana!</strong></p>
+        <label><input type="radio" name="q5" value="75/100"> 75/100</label>
+        <label><input type="radio" name="q5" value="3/4"> 3/4</label>
+        <label><input type="radio" name="q5" value="7/10"> 7/10</label>
+        <label><input type="radio" name="q5" value="15/20"> 15/20</label>
+
+        <p><strong>6. Lingkaran memiliki jari-jari 14 cm. Berapakah luasnya? (gunakan π = 22/7)</strong></p>
+        <label><input type="radio" name="q6" value="308"> 308 cm²</label>
+        <label><input type="radio" name="q6" value="616"> 616 cm²</label>
+        <label><input type="radio" name="q6" value="154"> 154 cm²</label>
+        <label><input type="radio" name="q6" value="88"> 88 cm²</label>
+
+        <p><strong>7. Berapakah hasil dari 3x × 4x?</strong></p>
+        <label><input type="radio" name="q7" value="7x"> 7x</label>
+        <label><input type="radio" name="q7" value="12x"> 12x</label>
+        <label><input type="radio" name="q7" value="12x²"> 12x²</label>
+        <label><input type="radio" name="q7" value="7x²"> 7x²</label>
+
+        <button onclick="submitCourseQuiz()">Kirim Jawaban 🎯</button>
+      </div>
+      
+      <div id="quiz-result"></div>
+    </section>
+  </main>
+
+  <script>
+    // KONFIGURASI COURSE
+    const COURSE_ID = '69312d762493a5ac186aa61b';
+    const COURSE_SECTIONS = ['section_1', 'section_2', 'section_3'];
+    const COURSE_QUIZZES = ['quiz_1'];
+    
+    const QUIZ_ANSWERS = {
+      'q1': '5',
+      'q2': '81',
+      'q3': '40',
+      'q4': '3/4',
+      'q5': '3/4',
+      'q6': '616',
+      'q7': '12x²'
+    };
+
+    function goBack() {
+      window.history.back();
+    }
+
+    // API CONFIGURATION
+    const API_URL = 'http://localhost:5000/api';
+    const TOKEN = localStorage.getItem('token');
+
+    // API Object
+    const courseAPI = {
+      async markSectionComplete(sectionId) {
+        try {
+          const response = await fetch(`${API_URL}/courses/${COURSE_ID}/progress`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${TOKEN}`
+            },
+            body: JSON.stringify({
+              sectionId: sectionId,
+              completed: true
+            })
+          });
+          return await response.json();
+        } catch (error) {
+          console.error('Error marking section complete:', error);
+          return null;
+        }
+      },
+
+      async submitQuiz(quizId, score) {
+        try {
+          const response = await fetch(`${API_URL}/courses/${COURSE_ID}/quiz`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${TOKEN}`
+            },
+            body: JSON.stringify({
+              quizId: quizId,
+              score: score
+            })
+          });
+          return await response.json();
+        } catch (error) {
+          console.error('Error submitting quiz:', error);
+          return null;
+        }
+      },
+
+      async getProgress() {
+        try {
+          const response = await fetch(`${API_URL}/courses/${COURSE_ID}/progress`, {
+            headers: {
+              'Authorization': `Bearer ${TOKEN}`
+            }
+          });
+          return await response.json();
+        } catch (error) {
+          console.error('Error getting progress:', error);
+          return null;
+        }
+      }
+    };
+
+    // Calculate Quiz Score
+    function calculateQuizScore() {
+      let correct = 0;
+      const total = Object.keys(QUIZ_ANSWERS).length;
+
+      for (const [question, correctAnswer] of Object.entries(QUIZ_ANSWERS)) {
+        const selectedAnswer = document.querySelector(`input[name="${question}"]:checked`);
+        if (selectedAnswer && selectedAnswer.value === correctAnswer) {
+          correct++;
+        }
+      }
+
+      return Math.round((correct / total) * 100);
+    }
+
+    // Mark Section Complete
+    async function markComplete(sectionId) {
+      const result = await courseAPI.markSectionComplete(sectionId);
+      if (result) {
+        alert('✅ Section berhasil ditandai selesai!');
+        updateProgressDisplay();
+      } else {
+        alert('❌ Gagal menandai section. Pastikan Anda sudah login.');
+      }
+    }
+
+    // Submit Quiz
+    async function submitCourseQuiz() {
+      const allAnswered = Object.keys(QUIZ_ANSWERS).every(q => 
+        document.querySelector(`input[name="${q}"]:checked`)
+      );
+
+      if (!allAnswered) {
+        alert('⚠️ Harap jawab semua pertanyaan!');
+        return;
+      }
+
+      const score = calculateQuizScore();
+      const result = await courseAPI.submitQuiz('quiz_1', score);
+
+      const resultDiv = document.getElementById('quiz-result');
+      if (result && result.passed) {
+        resultDiv.className = 'quiz-passed';
+        resultDiv.innerHTML = `
+          🎉 <strong>Selamat!</strong> Anda lulus dengan nilai ${score}%!<br>
+          ${result.badge ? `🏅 Badge diperoleh: ${result.badge}` : ''}
+        `;
+        document.getElementById('question-container').style.display = 'none';
+      } else {
+        resultDiv.className = 'quiz-failed';
+        resultDiv.innerHTML = `
+          😞 Nilai Anda: ${score}%. Minimal nilai kelulusan adalah 60%.<br>
+          Silakan pelajari kembali materi dan coba lagi!
+        `;
+      }
+
+      updateProgressDisplay();
+    }
+
+    // Update Progress Display
+    async function updateProgressDisplay() {
+      const progress = await courseAPI.getProgress();
+      
+      if (progress) {
+        // Update progress bar
+        const completedSections = progress.sectionsCompleted || [];
+        const totalSections = COURSE_SECTIONS.length;
+        const percentage = Math.round((completedSections.length / totalSections) * 100);
+        document.getElementById('progress-display').textContent = `Progres: ${percentage}%`;
+
+        // Update section status
+        COURSE_SECTIONS.forEach(sectionId => {
+          const statusElement = document.getElementById(`status_${sectionId}`);
+          if (statusElement) {
+            if (completedSections.includes(sectionId)) {
+              statusElement.textContent = '✅ Selesai';
+              statusElement.className = 'status completed';
+            } else {
+              statusElement.textContent = '⏳ Belum Selesai';
+              statusElement.className = 'status incomplete';
+            }
+          }
+        });
+
+        // Check quiz status
+        if (progress.quizzesPassed && progress.quizzesPassed.includes('quiz_1')) {
+          const resultDiv = document.getElementById('quiz-result');
+          resultDiv.className = 'quiz-passed';
+          resultDiv.innerHTML = `
+            ✅ <strong>Anda sudah menyelesaikan quiz ini!</strong><br>
+            Nilai Anda: ${progress.quizScores?.quiz_1 || 'N/A'}%
+          `;
+          document.getElementById('question-container').style.display = 'none';
+        }
+      }
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', updateProgressDisplay);
+  </script>
+</body>
+</html>

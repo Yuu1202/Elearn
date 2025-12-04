@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dasar-Dasar Dunia Naruto: Era Hokage Ke-7</title>
+  
+  <style>
+/* --- style.css content starts --- */
+/*
+ * Bagian CSS: Menentukan tampilan visual halaman (Gaya Desain).
+ *
+ * Catatan: Dalam file ini, CSS diletakkan langsung di dalam tag <style>
+ * agar aplikasi bisa berjalan dalam satu file.
+ */
+body {
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  margin: 0;
+  padding: 20px;
+  background-color: #f4f4f9; /* Latar belakang abu-abu muda */
+}
+
+header {
+  background: #333; /* Latar belakang header hitam */
+  color: white;
+  padding: 10px 20px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between; /* Menata judul dan progres di ujung yang berlawanan */
+  align-items: center;
+}
+
+h1, h2 {
+  color: #333;
+}
+
+/* Styling untuk setiap bagian materi kursus dan kuis */
+.course-section, .course-quiz {
+  background: white;
+  padding: 20px;
+  border-radius: 8px; /* Sudut membulat */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Efek bayangan */
+  margin-bottom: 20px;
+}
+
+/* Styling tombol 'Selesai' */
+.complete-btn {
+  background: #fa8b00; /* Warna oranye/kuning khas Naruto */
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.complete-btn:hover {
+  background: #cc7400; /* Sedikit lebih gelap saat disentuh */
+}
+
+.completed {
+  color: green; /* Warna hijau untuk status selesai */
+  font-weight: bold;
+  margin-left: 10px;
+}
+
+.incomplete {
+  color: orange; /* Warna oranye untuk status belum selesai */
+  font-weight: bold;
+  margin-left: 10px;
+}
+
+#quiz-result {
+  margin-top: 15px;
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+/* --- style.css content ends --- */
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Dasar-Dasar Dunia Naruto: Era Hokage Ke-7</h1>
+    <div id="progress-display">Progres: 0%</div>
+  </header>
+
+  <main>
+    <section id="section_1" class="course-section">
+      <h2>1. Konoha: Desa Tersembunyi Daun</h2>
+      <p>Konohagakure adalah desa tempat asal Uzumaki Naruto. Desa ini dikenal memiliki Hokage sebagai pemimpinnya, yang merupakan ninja terkuat dan paling bijaksana di desa. Pelajari tentang lambang desa, Tembok Monumen Hokage, dan konsep 'Tekad Api' (Will of Fire).</p>
+      <button onclick="markComplete('section_1')" class="complete-btn">Tandai Selesai: Konoha</button>
+      <span class="status" id="status_section_1"></span>
+    </section>
+    
+    <section id="section_2" class="course-section">
+      <h2>2. Sistem Peringkat Ninja (Genin, Chunin, Jonin)</h2>
+      <p>Siswa akademi harus lulus untuk menjadi Genin, pangkat terendah. Kemudian mereka berpartisipasi dalam Ujian Chunin untuk promosi. Pangkat tertinggi yang umum adalah Jonin. Naruto sendiri memulai sebagai Genin dan akhirnya menjadi Hokage Ke-7.</p>
+      <button onclick="markComplete('section_2')" class="complete-btn">Tandai Selesai: Peringkat Ninja</button>
+      <span class="status" id="status_section_2"></span>
+    </section>
+
+    <section id="section_3" class="course-section">
+      <h2>3. Chakra & Teknik Dasar: Jutsu</h2>
+      <p>Chakra adalah energi yang digunakan ninja untuk melakukan Jutsu (teknik ninja). Tiga kategori utama Jutsu adalah Ninjutsu (teknik elemen), Genjutsu (ilusi), dan Taijutsu (bertarung fisik). Teknik dasar yang wajib dikuasai adalah Teknik Klon dan Teknik Transformasi.</p>
+      <button onclick="markComplete('section_3')" class="complete-btn">Tandai Selesai: Chakra & Jutsu</button>
+      <span class="status" id="status_section_3"></span>
+    </section>
+
+    <section id="quiz_1" class="course-quiz">
+      <h2>Quiz Akhir: Ujian Ninja Level 1</h2>
+      <div id="question-container">
+        <p>1. Apa nama teknik yang paling sering digunakan Naruto, yang melibatkan pembuatan ribuan klon?</p>
+        <input type="radio" name="q1" value="Kage Bunshin no Jutsu"> Kage Bunshin no Jutsu (Teknik Klon Bayangan)<br>
+        <input type="radio" name="q1" value="Rasengan"> Rasengan<br>
+        <input type="radio" name="q1" value="Chidori"> Chidori<br>
+        <button onclick="submitCourseQuiz()">Kirim Jawaban</button>
+      </div>
+      <div id="quiz-result"></div>
+    </section>
+  </main>
+
+  <script>
+    // Metadata Kursus (Variabel Konstanta)
+    const COURSE_ID = '69313140b9375067dda26f2a'; // ID unik kursus saat ini
+    const COURSE_SECTIONS = ['naruto_1', 'naruto_2', 'naruto_3']; // Daftar ID semua section
+    const COURSE_QUIZZES = ['quiz_1']; // Daftar ID semua quiz
+    
+    // Kunci Jawaban Quiz
+    const QUIZ_ANSWERS = {
+      // Jawaban yang benar untuk pertanyaan kuis
+      'q1': 'Kage Bunshin no Jutsu' 
+    };
+    
+/* --- script.js content starts --- */
+//
+// Bagian JavaScript: Mengelola logika interaksi, API, dan progres pengguna.
+//
+
+// Konfigurasi API Back-end
+const API_URL = 'http://localhost:5000/api'; // URL dasar untuk endpoint API
+const TOKEN = localStorage.getItem('token'); // Mengambil token otentikasi dari penyimpanan lokal
+
+// Objek courseAPI: Berisi fungsi-fungsi untuk berinteraksi dengan back-end
+const courseAPI = {
+  // Fungsi untuk menandai sebuah section telah selesai
+  async markSectionComplete(sectionId) {
+    if (!TOKEN) {
+      alert('Silakan login untuk melacak progres'); // Notifikasi jika pengguna belum login
+      return;
+    }
+    
+    try {
+      // Melakukan Panggilan API (PUT request) untuk update progres
+      const response = await fetch(`${API_URL}/progress/section`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${TOKEN}`, // Menyertakan token otentikasi
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 
+          courseId: COURSE_ID, 
+          sectionId 
+        })
+      });
+      
+      if (response.status === 404) {
+          // Asumsi Course ID salah atau tidak ada
+          console.error("Course not found or invalid data received.");
+          return null;
+      }
+      
+      const data = await response.json();
+      
+      // Jika pengguna mendapatkan lencana (badge), tampilkan notifikasi
+      if (data.badgeEarned) {
+        alert(`🎉 Lencana Diperoleh: ${data.badgeEarned.badgeName}`);
+      }
+      
+      console.log('Section completed:', data);
+      await updateProgressDisplay(); // Memperbarui tampilan progres di halaman
+      return data;
+    } catch (error) {
+      console.error('Error marking section:', error);
+      alert('Gagal mencatat progres section.');
+    }
+  },
+  
+  // Fungsi untuk mengirimkan hasil quiz
+  async submitQuiz(quizId, score) {
+    if (!TOKEN) {
+      alert('Silakan login untuk menyimpan hasil kuis');
+      return;
+    }
+    
+    try {
+      // Melakukan Panggilan API (POST request) untuk mengirim skor quiz
+      const response = await fetch(`${API_URL}/progress/quiz`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${TOKEN}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          courseId: COURSE_ID,
+          quizId,
+          score
+        })
+      });
+      
+      if (!response.ok) {
+           throw new Error('Gagal mengirim hasil kuis.');
+      }
+      
+      const data = await response.json();
+      
+      if (data.badgeEarned) {
+        alert(`🎉 Lencana Diperoleh: ${data.badgeEarned.badgeName}`);
+      }
+      
+      await updateProgressDisplay(); // Memperbarui tampilan progres
+      return data; // Mengembalikan { score, passed, badgeEarned }
+    } catch (error) {
+      console.error('Error submitting quiz:', error);
+      alert(error.message || 'Gagal mengirim hasil kuis.');
+    }
+  },
+  
+  // Fungsi untuk mendapatkan data progres pengguna saat ini
+  async getProgress() {
+    if (!TOKEN) return null;
+    
+    try {
+      // Melakukan Panggilan API (GET request) untuk mengambil progres
+      const response = await fetch(`${API_URL}/progress/course/${COURSE_ID}`, {
+        headers: {
+          'Authorization': `Bearer ${TOKEN}`
+        }
+      });
+      
+      if (response.status === 404) {
+        return { completedSections: [], quizResults: [], progressPercentage: 0 }; // Return objek kosong jika belum dimulai
+      }
+      
+      if (response.ok) {
+        return await response.json();
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('Error getting progress:', error);
+      return null;
+    }
+  }
+};
+
+/**
+ * Logika Course Client (Fungsi Interaksi UI)
+ */
+
+// Menghitung skor quiz berdasarkan jawaban pengguna
+function calculateQuizScore() {
+  let score = 0;
+  
+  // Mengambil jawaban yang dicentang oleh pengguna
+  const q1_answer = document.querySelector('input[name="q1"]:checked')?.value;
+
+  // Membandingkan dengan kunci jawaban. Asumsi hanya 1 soal.
+  if (q1_answer === QUIZ_ANSWERS['q1']) {
+    score += 1; // Menambah skor jika jawaban benar
+  }
+  
+  return score; // Skor maksimal 1
+}
+
+// Handler utama saat tombol 'Tandai Selesai' diklik
+async function markComplete(sectionId) {
+  const result = await courseAPI.markSectionComplete(sectionId); // Panggil API untuk menandai selesai
+  
+  // updateProgressDisplay() sudah dipanggil di courseAPI.markSectionComplete
+}
+
+// Handler utama saat tombol 'Kirim Jawaban Quiz' diklik
+async function submitCourseQuiz() {
+  const score = calculateQuizScore(); // Hitung skor quiz
+  const quizId = COURSE_QUIZZES[0];
+  
+  const result = await courseAPI.submitQuiz(quizId, score); // Panggil API untuk mengirim skor
+  const resultDiv = document.getElementById('quiz-result');
+
+  // Tampilkan hasil quiz di UI (setelah updateProgressDisplay selesai)
+  if (result) {
+    resultDiv.innerHTML = `<strong>Hasil Anda: ${score} dari 1.</strong><br>`;
+    // Cek properti 'passed' dari response API
+    if (result.passed) {
+      resultDiv.innerHTML += '<span style="color: green; font-weight: bold;">Selamat! Anda Lulus Kuis.</span>';
+    } else {
+      resultDiv.innerHTML += '<span style="color: red; font-weight: bold;">Anda Gagal. Coba Lagi!</span>';
+    }
+  } else {
+    resultDiv.innerHTML = 'Gagal mengirim hasil kuis.';
+  }
+}
+
+// Fungsi utama untuk memperbarui seluruh tampilan progres di halaman
+async function updateProgressDisplay() {
+  // Jika getProgress() gagal, ia mengembalikan { completedSections: [], quizResults: [], progressPercentage: 0 }
+  const progress = await courseAPI.getProgress(); 
+  const display = document.getElementById('progress-display');
+  
+  if (!progress) {
+    display.textContent = 'Progres: Gagal memuat data';
+    return;
+  }
+  
+  // Ambil daftar quiz yang sudah LULUS (passed: true)
+  const passedQuizzes = (progress.quizResults || [])
+     .filter(r => r.passed)
+     .map(r => r.quizId);
+  
+  // Perhitungan Progres
+  const totalItems = COURSE_SECTIONS.length + COURSE_QUIZZES.length; 
+  const sectionsDone = progress.completedSections.filter(s => COURSE_SECTIONS.includes(s)).length;
+  // FIX KRUSIAL: Gunakan passedQuizzes
+  const quizzesDone = passedQuizzes.filter(qId => COURSE_QUIZZES.includes(qId)).length;
+  const itemsDone = sectionsDone + quizzesDone;
+  
+  // Menggunakan progressPercentage dari backend jika tersedia, jika tidak hitung di frontend
+  const percentage = progress.progressPercentage !== undefined 
+      ? progress.progressPercentage 
+      : (totalItems > 0 ? Math.round((itemsDone / totalItems) * 100) : 0);
+  
+  // Tampilkan persentase progres
+  display.textContent = `Progres: ${percentage}% (${itemsDone}/${totalItems} item)`;
+  
+  // Update status visual untuk setiap section
+  COURSE_SECTIONS.forEach(sectionId => {
+    const statusEl = document.getElementById(`status_${sectionId}`);
+    const buttonEl = document.querySelector(`#${sectionId} .complete-btn`);
+    if (statusEl) {
+      if (progress.completedSections.includes(sectionId)) {
+        statusEl.textContent = '✅ Selesai';
+        statusEl.classList.add('completed');
+        statusEl.classList.remove('incomplete');
+        if (buttonEl) buttonEl.disabled = true;
+      } else {
+        statusEl.textContent = '⏳ Belum Selesai';
+        statusEl.classList.add('incomplete');
+        statusEl.classList.remove('completed');
+        if (buttonEl) buttonEl.disabled = false;
+      }
+    }
+  });
+
+  // Update status Quiz
+  const quizResultDiv = document.getElementById('quiz-result');
+  const questionContainer = document.getElementById('question-container');
+  const quizId = COURSE_QUIZZES[0];
+  
+  // FIX KRUSIAL: Cek apakah quizId ada di daftar passedQuizzes
+  if (passedQuizzes.includes(quizId)) {
+    quizResultDiv.innerHTML = '<strong>✨ Kuis ini sudah selesai dan tersimpan di riwayat Anda. (LULUS)</strong>';
+    if (questionContainer) {
+      questionContainer.style.display = 'none'; // Sembunyikan form jika sudah lulus
+    }
+  } else {
+    // Jika belum lulus, tampilkan form
+    if (questionContainer) {
+      questionContainer.style.display = 'block';
+    }
+    // Cek apakah user pernah mencoba tapi gagal
+    const failedAttempt = progress.quizResults.find(r => r.quizId === quizId && !r.passed);
+    if (failedAttempt) {
+       quizResultDiv.innerHTML = '<span style="color: red; font-weight: bold;">Anda belum lulus. Coba lagi!</span>';
+    } else {
+       quizResultDiv.innerHTML = '';
+    }
+  }
+}
+
+// Event Listener: Panggil updateProgressDisplay saat halaman selesai dimuat (Inisialisasi)
+document.addEventListener('DOMContentLoaded', updateProgressDisplay);
+/* --- script.js content ends --- */
+  </script>
+</body>
+</html>

@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Sains - Dasar-Dasar IPA</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+        }
+
+        .progress-container {
+            background: #f8f9fa;
+            padding: 30px;
+            border-bottom: 3px solid #e9ecef;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e9ecef;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .course-section, .course-quiz {
+            background: #ffffff;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .course-section:hover, .course-quiz:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+
+        .course-section h2, .course-quiz h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .course-section h3 {
+            color: #764ba2;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .course-section p, .course-section ul {
+            color: #495057;
+            line-height: 1.8;
+            margin-bottom: 15px;
+            font-size: 1.05em;
+        }
+
+        .course-section ul {
+            padding-left: 30px;
+        }
+
+        .course-section li {
+            margin-bottom: 10px;
+        }
+
+        .complete-btn, .quiz-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .complete-btn:hover, .quiz-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(102, 126, 234, 0.5);
+        }
+
+        .complete-btn:active, .quiz-btn:active {
+            transform: translateY(0);
+        }
+
+        .status {
+            display: inline-block;
+            margin-left: 15px;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .status.completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        #question-container {
+            margin: 20px 0;
+        }
+
+        .question-block {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .question-block p {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .question-block label {
+            display: block;
+            padding: 12px 15px;
+            margin: 8px 0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+        }
+
+        .question-block label:hover {
+            background: #e7f1ff;
+            border-color: #667eea;
+        }
+
+        .question-block input[type="radio"] {
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        #quiz-result {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            text-align: center;
+            font-size: 1.2em;
+        }
+
+        #quiz-result.pass {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #28a745;
+        }
+
+        #quiz-result.fail {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #dc3545;
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .info-box strong {
+            color: #1976D2;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .course-section, .course-quiz {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔬 Course Sains</h1>
+            <p>Dasar-Dasar Ilmu Pengetahuan Alam</p>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-label">
+                <span>Progress Course</span>
+                <span id="progress-text">0%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Section 1: Metode Ilmiah -->
+            <section id="section_1" class="course-section">
+                <h2>1. Metode Ilmiah 🧪</h2>
+                
+                <p>Metode ilmiah adalah pendekatan sistematis yang digunakan para ilmuwan untuk memahami fenomena alam. Metode ini membantu kita mendapatkan pengetahuan yang dapat diuji dan diverifikasi.</p>
+                
+                <h3>Langkah-langkah Metode Ilmiah:</h3>
+                <ul>
+                    <li><strong>Observasi:</strong> Mengamati fenomena alam dan mengidentifikasi pertanyaan</li>
+                    <li><strong>Hipotesis:</strong> Membuat dugaan sementara berdasarkan pengamatan</li>
+                    <li><strong>Eksperimen:</strong> Melakukan percobaan untuk menguji hipotesis</li>
+                    <li><strong>Analisis Data:</strong> Mengumpulkan dan menganalisis hasil eksperimen</li>
+                    <li><strong>Kesimpulan:</strong> Menarik kesimpulan apakah hipotesis terbukti atau tidak</li>
+                </ul>
+
+                <div class="info-box">
+                    <strong>💡 Contoh:</strong> Jika tanaman layu, kita berhipotesis bahwa tanaman kekurangan air. Kita melakukan eksperimen dengan menyiram tanaman, lalu mengamati hasilnya.
+                </div>
+
+                <p>Metode ilmiah penting karena memastikan penelitian dilakukan secara objektif dan dapat diulang oleh peneliti lain untuk memverifikasi hasilnya.</p>
+
+                <button onclick="markComplete('section_1')" class="complete-btn">Tandai Selesai ✓</button>
+                <span class="status" id="status_section_1"></span>
+            </section>
+
+            <!-- Section 2: Fisika Dasar -->
+            <section id="section_2" class="course-section">
+                <h2>2. Fisika Dasar ⚛️</h2>
+                
+                <p>Fisika adalah ilmu yang mempelajari materi, energi, dan interaksi antara keduanya. Fisika menjelaskan bagaimana alam semesta bekerja pada tingkat paling fundamental.</p>
+                
+                <h3>Konsep Dasar Fisika:</h3>
+                
+                <p><strong>Gerak dan Gaya</strong></p>
+                <ul>
+                    <li>Hukum Newton I: Benda diam akan tetap diam dan benda bergerak akan tetap bergerak kecuali ada gaya yang mempengaruhinya</li>
+                    <li>Hukum Newton II: Percepatan berbanding lurus dengan gaya (F = m × a)</li>
+                    <li>Hukum Newton III: Setiap aksi memiliki reaksi yang sama besar namun berlawanan arah</li>
+                </ul>
+
+                <p><strong>Energi</strong></p>
+                <ul>
+                    <li>Energi kinetik: energi yang dimiliki benda karena gerakannya</li>
+                    <li>Energi potensial: energi yang tersimpan dalam suatu sistem</li>
+                    <li>Hukum kekekalan energi: energi tidak dapat diciptakan atau dimusnahkan, hanya berubah bentuk</li>
+                </ul>
+
+                <div class="info-box">
+                    <strong>🚀 Aplikasi:</strong> Roket bekerja berdasarkan Hukum Newton III - gas yang disemburkan ke bawah mendorong roket ke atas!
+                </div>
+
+                <button onclick="markComplete('section_2')" class="complete-btn">Tandai Selesai ✓</button>
+                <span class="status" id="status_section_2"></span>
+            </section>
+
+            <!-- Section 3: Kimia Dasar -->
+            <section id="section_3" class="course-section">
+                <h2>3. Kimia Dasar 🧬</h2>
+                
+                <p>Kimia adalah ilmu yang mempelajari materi, komposisi, struktur, sifat, dan perubahan yang terjadi pada materi. Kimia sering disebut sebagai "ilmu pusat" karena menghubungkan fisika dengan biologi.</p>
+                
+                <h3>Konsep Fundamental Kimia:</h3>
+                
+                <p><strong>Atom dan Molekul</strong></p>
+                <ul>
+                    <li>Atom adalah unit terkecil dari unsur yang masih mempertahankan sifat unsur tersebut</li>
+                    <li>Molekul adalah gabungan dua atau lebih atom yang terikat secara kimia</li>
+                    <li>Tabel periodik mengorganisir semua unsur berdasarkan sifat kimianya</li>
+                </ul>
+
+                <p><strong>Reaksi Kimia</strong></p>
+                <ul>
+                    <li>Reaktan: zat yang bereaksi (sebelum reaksi)</li>
+                    <li>Produk: zat yang dihasilkan (setelah reaksi)</li>
+                    <li>Hukum kekekalan massa: massa total reaktan sama dengan massa total produk</li>
+                </ul>
+
+                <div class="info-box">
+                    <strong>💧 Contoh:</strong> Air (H₂O) terbentuk dari 2 atom hidrogen dan 1 atom oksigen yang berikatan secara kimia.
+                </div>
+
+                <p><strong>Ikatan Kimia</strong></p>
+                <p>Ada tiga jenis ikatan kimia utama: ikatan ionik (transfer elektron), ikatan kovalen (berbagi elektron), dan ikatan logam (elektron bergerak bebas).</p>
+
+                <button onclick="markComplete('section_3')" class="complete-btn">Tandai Selesai ✓</button>
+                <span class="status" id="status_section_3"></span>
+            </section>
+
+            <!-- Section 4: Biologi Dasar -->
+            <section id="section_4" class="course-section">
+                <h2>4. Biologi Dasar 🌱</h2>
+                
+                <p>Biologi adalah ilmu yang mempelajari kehidupan dan organisme hidup, termasuk struktur, fungsi, pertumbuhan, evolusi, distribusi, dan taksonomi mereka.</p>
+                
+                <h3>Karakteristik Makhluk Hidup:</h3>
+                <ul>
+                    <li><strong>Organisasi seluler:</strong> Semua makhluk hidup terdiri dari satu atau lebih sel</li>
+                    <li><strong>Metabolisme:</strong> Melakukan reaksi kimia untuk menghasilkan energi</li>
+                    <li><strong>Homeostasis:</strong> Menjaga keseimbangan internal</li>
+                    <li><strong>Pertumbuhan:</strong> Bertambah ukuran dan kompleksitas</li>
+                    <li><strong>Reproduksi:</strong> Menghasilkan keturunan</li>
+                    <li><strong>Respon terhadap stimulus:</strong> Bereaksi terhadap lingkungan</li>
+                    <li><strong>Adaptasi:</strong> Berevolusi untuk menyesuaikan diri dengan lingkungan</li>
+                </ul>
+
+                <h3>Sel - Unit Dasar Kehidupan:</h3>
+                <p>Sel adalah unit struktural dan fungsional terkecil dari kehidupan. Ada dua jenis sel utama:</p>
+                <ul>
+                    <li><strong>Sel Prokariotik:</strong> Tidak memiliki inti sel (contoh: bakteri)</li>
+                    <li><strong>Sel Eukariotik:</strong> Memiliki inti sel dan organel (contoh: sel manusia, tumbuhan, hewan)</li>
+                </ul>
+
+                <div class="info-box">
+                    <strong>🔬 Fakta Menarik:</strong> Tubuh manusia terdiri dari sekitar 37 triliun sel!
+                </div>
+
+                <button onclick="markComplete('section_4')" class="complete-btn">Tandai Selesai ✓</button>
+                <span class="status" id="status_section_4"></span>
+            </section>
+
+            <!-- Quiz -->
+            <section id="quiz_1" class="course-quiz">
+                <h2>🎯 Kuis Akhir - Uji Pemahaman Anda</h2>
+                <p>Jawab semua pertanyaan berikut untuk mendapatkan badge course!</p>
+                
+                <div id="question-container">
+                    <div class="question-block">
+                        <p>1. Apa langkah pertama dalam metode ilmiah?</p>
+                        <label><input type="radio" name="q1" value="hipotesis"> Membuat hipotesis</label>
+                        <label><input type="radio" name="q1" value="observasi"> Melakukan observasi</label>
+                        <label><input type="radio" name="q1" value="eksperimen"> Melakukan eksperimen</label>
+                        <label><input type="radio" name="q1" value="kesimpulan"> Menarik kesimpulan</label>
+                    </div>
+
+                    <div class="question-block">
+                        <p>2. Hukum Newton yang menyatakan "setiap aksi memiliki reaksi yang sama besar namun berlawanan arah" adalah...</p>
+                        <label><input type="radio" name="q2" value="newton1"> Hukum Newton I</label>
+                        <label><input type="radio" name="q2" value="newton2"> Hukum Newton II</label>
+                        <label><input type="radio" name="q2" value="newton3"> Hukum Newton III</label>
+                        <label><input type="radio" name="q2" value="gravitasi"> Hukum Gravitasi</label>
+                    </div>
+
+                    <div class="question-block">
+                        <p>3. Rumus kimia air adalah...</p>
+                        <label><input type="radio" name="q3" value="h2o"> H₂O</label>
+                        <label><input type="radio" name="q3" value="co2"> CO₂</label>
+                        <label><input type="radio" name="q3" value="o2"> O₂</label>
+                        <label><input type="radio" name="q3" value="h2"> H₂</label>
+                    </div>
+
+                    <div class="question-block">
+                        <p>4. Unit terkecil dari kehidupan adalah...</p>
+                        <label><input type="radio" name="q4" value="atom"> Atom</label>
+                        <label><input type="radio" name="q4" value="molekul"> Molekul</label>
+                        <label><input type="radio" name="q4" value="sel"> Sel</label>
+                        <label><input type="radio" name="q4" value="jaringan"> Jaringan</label>
+                    </div>
+
+                    <div class="question-block">
+                        <p>5. Energi tidak dapat diciptakan atau dimusnahkan, hanya berubah bentuk. Ini adalah bunyi dari...</p>
+                        <label><input type="radio" name="q5" value="kekekalan_massa"> Hukum Kekekalan Massa</label>
+                        <label><input type="radio" name="q5" value="kekekalan_energi"> Hukum Kekekalan Energi</label>
+                        <label><input type="radio" name="q5" value="newton"> Hukum Newton</label>
+                        <label><input type="radio" name="q5" value="termodinamika"> Hukum Termodinamika Pertama</label>
+                    </div>
+                </div>
+
+                <button onclick="submitCourseQuiz()" class="quiz-btn">Kirim Jawaban 🎯</button>
+                <div id="quiz-result"></div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        // [1] KONFIGURASI COURSE (Source of Truth)
+        const COURSE_ID = '69312f0f2493a5ac186aa64e';
+        const COURSE_SECTIONS = ['section_1', 'section_2', 'section_3', 'section_4'];
+        const COURSE_QUIZZES = ['quiz_1'];
+
+        // [2] KUNCI JAWABAN KUIS (KRITIS - Harus match dengan value di HTML)
+        const QUIZ_ANSWERS = {
+            'q1': 'observasi',
+            'q2': 'newton3',
+            'q3': 'h2o',
+            'q4': 'sel',
+            'q5': 'kekekalan_energi'
+        };
+
+        // API Base URL
+        const API_BASE = 'https://w4013437.clouding.host/api';
+
+        // Helper: Update Progress Display
+        function updateProgressDisplay() {
+            fetch(`${API_BASE}/progress/${COURSE_ID}`)
+                .then(res => res.json())
+                .then(data => {
+                    const completed = data.completedSections || [];
+                    const total = COURSE_SECTIONS.length + COURSE_QUIZZES.length;
+                    const progress = Math.round((completed.length / total) * 100);
+
+                    document.getElementById('progress-fill').style.width = progress + '%';
+                    document.getElementById('progress-text').textContent = progress + '%';
+
+                    // Update status untuk setiap section
+                    COURSE_SECTIONS.forEach(sectionId => {
+                        const statusEl = document.getElementById(`status_${sectionId}`);
+                        if (completed.includes(sectionId)) {
+                            statusEl.textContent = '✓ Selesai';
+                            statusEl.className = 'status completed';
+                        }
+                    });
+
+                    // Update status quiz
+                    COURSE_QUIZZES.forEach(quizId => {
+                        const statusEl = document.getElementById(`status_${quizId}`);
+                        if (completed.includes(quizId)) {
+                            statusEl.textContent = '✓ Selesai';
+                            statusEl.className = 'status completed';
+                        }
+                    });
+                })
+                .catch(err => console.error('Error loading progress:', err));
+        }
+
+        // Mark Section Complete
+        function markComplete(sectionId) {
+            fetch(`${API_BASE}/progress/${COURSE_ID}/complete`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sectionId })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    updateProgressDisplay();
+                    alert('✓ Materi berhasil ditandai selesai!');
+                }
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                alert('Terjadi kesalahan. Silakan coba lagi.');
+            });
+        }
+
+        // Submit Quiz
+        function submitCourseQuiz() {
+            const answers = {};
+            let allAnswered = true;
+
+            // Kumpulkan jawaban
+            Object.keys(QUIZ_ANSWERS).forEach(qName => {
+                const selected = document.querySelector(`input[name="${qName}"]:checked`);
+                if (selected) {
+                    answers[qName] = selected.value;
+                } else {
+                    allAnswered = false;
+                }
+            });
+
+            if (!allAnswered) {
+                alert('⚠️ Mohon jawab semua pertanyaan!');
+                return;
+            }
+
+            // Hitung skor
+            let correct = 0;
+            Object.keys(QUIZ_ANSWERS).forEach(qName => {
+                if (answers[qName] === QUIZ_ANSWERS[qName]) {
+                    correct++;
+                }
+            });
+
+            const score = Math.round((correct / Object.keys(QUIZ_ANSWERS).length) * 100);
+            const passed = score >= 70;
+
+            // Tampilkan hasil
+            const resultDiv = document.getElementById('quiz-result');
+            resultDiv.className = passed ? 'pass' : 'fail';
+            resultDiv.textContent = `Skor Anda: ${score}% (${correct}/${Object.keys(QUIZ_ANSWERS).length} benar) - ${passed ? '🎉 LULUS!' : '❌ Belum Lulus (minimal 70%)'}`;
+
+            // Kirim ke API jika lulus
+            if (passed) {
+                fetch(`${API_BASE}/progress/${COURSE_ID}/complete`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        sectionId: 'quiz_1',
+                        score: score 
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        updateProgressDisplay();
+                        setTimeout(() => {
+                            alert('🎉 Selamat! Anda telah menyelesaikan course dan mendapatkan badge!');
+                        }, 500);
+                    }
+                })
+                .catch(err => console.error('Error submitting quiz:', err));
+            }
+        }
+
+        // [3] PANGGILAN AKHIR WAJIB
+        document.addEventListener('DOMContentLoaded', updateProgressDisplay);
+    </script>
+</body>
+</html>

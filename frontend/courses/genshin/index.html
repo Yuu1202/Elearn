@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Genshin Impact - Panduan Lengkap</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 50%, #9b59b6 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '⚔️';
+            position: absolute;
+            font-size: 150px;
+            opacity: 0.1;
+            top: -20px;
+            right: -20px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+        }
+
+        .progress-container {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 30px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e9ecef;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .course-section, .course-quiz {
+            background: #ffffff;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .course-section:hover, .course-quiz:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .course-section h2, .course-quiz h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .course-section h3 {
+            color: #764ba2;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .course-section p, .course-section ul {
+            color: #495057;
+            line-height: 1.8;
+            margin-bottom: 15px;
+            font-size: 1.05em;
+        }
+
+        .course-section ul {
+            padding-left: 30px;
+        }
+
+        .course-section li {
+            margin-bottom: 10px;
+        }
+
+        .complete-btn, .quiz-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .complete-btn:hover, .quiz-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(102, 126, 234, 0.5);
+        }
+
+        .complete-btn:active, .quiz-btn:active {
+            transform: translateY(0);
+        }
+
+        .status {
+            display: inline-block;
+            margin-left: 15px;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .status.completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        #question-container {
+            margin: 20px 0;
+        }
+
+        .question-block {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .question-block p {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .question-block label {
+            display: block;
+            padding: 12px 15px;
+            margin: 8px 0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+        }
+
+        .question-block label:hover {
+            background: #e7f1ff;
+            border-color: #667eea;
+        }
+
+        .question-block input[type="radio"] {
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        #quiz-result {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            text-align: center;
+            font-size: 1.2em;
+        }
+
+        #quiz-result.pass {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #28a745;
+        }
+
+        #quiz-result.fail {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #dc3545;
+        }
+
+        .element-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 10px;
+            border-left: 5px solid #ffd700;
+        }
+
+        .element-box strong {
+            color: #ffd700;
+        }
+
+        .character-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .character-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #667eea;
+        }
+
+        .character-card strong {
+            color: #667eea;
+            font-size: 1.1em;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .course-section, .course-quiz {
+                padding: 20px;
+            }
+
+            .character-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚔️ Genshin Impact Course</h1>
+            <p>Panduan Lengkap untuk Traveler Pemula hingga Pro</p>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-label">
+                <span>Progress Course</span>
+                <span id="progress-text">0%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Section 1: Pengenalan Teyvat -->
+            <section id="genshin_1" class="course-section">
+                <h2>1. Pengenalan Dunia Teyvat 🌍</h2>
+                
+                <p>Genshin Impact adalah action RPG open-world yang dikembangkan oleh miHoYo. Game ini berlatar di dunia fantasi bernama Teyvat yang terdiri dari tujuh negara, masing-masing dengan elemen dan dewa pelindungnya sendiri.</p>
+                
+                <h3>Tujuh Elemen di Teyvat:</h3>
+                <ul>
+                    <li><strong>🔥 Pyro (Api):</strong> Elemen yang kuat untuk damage dan memicu reaksi pembakaran</li>
+                    <li><strong>💧 Hydro (Air):</strong> Elemen pendukung yang bagus untuk healing dan crowd control</li>
+                    <li><strong>⚡ Electro (Listrik):</strong> Elemen energi tinggi untuk reaksi chain damage</li>
+                    <li><strong>❄️ Cryo (Es):</strong> Elemen pembekuan yang efektif untuk crowd control</li>
+                    <li><strong>🌪️ Anemo (Angin):</strong> Elemen yang dapat menyebarkan elemen lain dan crowd control</li>
+                    <li><strong>🪨 Geo (Tanah):</strong> Elemen defensif yang menciptakan shield dan struktur</li>
+                    <li><strong>🌿 Dendro (Tumbuhan):</strong> Elemen terbaru yang fokus pada reaksi elemental kompleks</li>
+                </ul>
+
+                <div class="element-box">
+                    <strong>💡 Tips Pemula:</strong> Setiap elemen memiliki keunggulan dan kelemahan. Membangun tim dengan komposisi elemen yang tepat adalah kunci kesuksesan dalam pertempuran!
+                </div>
+
+                <p>Sebagai Traveler, Anda akan menjelajahi Teyvat untuk mencari saudara yang hilang sambil mengungkap misteri dunia yang penuh dengan dewa, monster, dan petualangan epik.</p>
+
+                <button onclick="markComplete('genshin_1')" class="complete-btn">Tandai Selesai ✓</button>
+                <span class="status" id="status_genshin_1"></span>
+            </section>
+
+            <!-- Section 2: Sistem Combat & Elemental Reactions -->
+            <section id="genshin_2" class="course-section">
+                <h2>2. Sistem Combat & Reaksi Elemental ⚔️</h2>
+                
+                <p>Sistem combat Genshin Impact berpusat pada penggunaan 4 karakter dalam satu party yang dapat ditukar kapan saja. Kunci kemenangan adalah memanfaatkan Elemental Reactions dengan benar.</p>
+                
+                <h3>Reaksi Elemental Penting:</h3>
+                
+                <p><strong>Reaksi Amplifying (Meningkatkan Damage):</strong></p>
+                <ul>
+                    <li><strong>Vaporize:</strong> Pyro + Hydro = Damage x1.5 atau x2</li>
+                    <li><strong>Melt:</strong> Pyro + Cryo = Damage x1.5 atau x2</li>
+                </ul>
+
+                <p><strong>Reaksi Transformative (Damage Tambahan):</strong></p>
+                <ul>
+                    <li><strong>Overloaded:</strong> Pyro + Electro = Ledakan AoE yang mendorong musuh</li>
+                    <li><strong>Superconduct:</strong> Cryo + Electro = Menurunkan Physical RES musuh</li>
+                    <li><strong>Electro-Charged:</strong> Hydro + Electro = Damage listrik berkelanjutan</li>
+                    <li><strong>Frozen:</strong> Cryo + Hydro = Membekukan musuh (combo dengan Shatter)</li>
+                    <li><strong>Swirl:</strong> Anemo + elemen lain = Menyebarkan elemen</li>
+                </ul>
+
+                <p><strong>Reaksi Dendro (Advanced):</strong></p>
+                <ul>
+                    <li><strong>Bloom:</strong> Dendro + Hydro = Menciptakan Dendro Core</li>
+                    <li><strong>Burning:</strong> Dendro + Pyro = Damage Pyro berkelanjutan</li>
+                    <li><strong>Quicken:</strong> Dendro + Electro = Meningkatkan reaksi selanjutnya</li>
+                </ul>
+
+                <div class="element-box">
+                    <strong>🎯 Strategy Tips:</strong> Tim terbaik biasanya memiliki 1 Main DPS, 1 Sub DPS, 1 Support, dan 1 Healer/Shielder. Rotasi skill yang tepat dapat menghasilkan damage jutaan!
+                </div>
+
+                <button onclick="markComplete('genshin_2')" class="complete-btn">Tandai Selesai ✓</button>
+                <span class="status" id="status_genshin_2"></span>
+            </section>
+
+            <!-- Section 3: Character Building -->
+            <section id="genshin_3" class="course-section">
+                <h2>3. Membangun Karakter yang Kuat 💪</h2>
+                
+                <p>Membangun karakter yang kuat memerlukan pemahaman tentang beberapa aspek penting: Artifact, Weapon, Talent, dan Constellation.</p>
+                
+                <h3>1. Artifacts (Artefak)</h3>
+                <p>Artifacts adalah equipment yang memberikan stat bonus. Set lengkap (4-5 pieces) memberikan bonus khusus.</p>
+                <ul>
+                    <li><strong>Flower:</strong> HP flat (selalu sama)</li>
+                    <li><strong>Feather:</strong> ATK flat (selalu sama)</li>
+                    <li><strong>Sands:</strong> Main stat bervariasi (ATK%, HP%, ER%, EM)</li>
+                    <li><strong>Goblet:</strong> Main stat bervariasi (Elemental DMG Bonus, Physical DMG)</li>
+                    <li><strong>Circlet:</strong> Main stat bervariasi (Crit Rate, Crit DMG, Healing Bonus)</li>
+                </ul>
+
+                <h3>2. Weapons (Senjata)</h3>
+                <p>Setiap karakter menggunakan tipe senjata tertentu. Weapon memberikan base ATK dan stat sekunder.</p>
+                <ul>
+                    <li>5-star weapons = paling kuat tapi langka</li>
+                    <li>4-star weapons = alternatif bagus yang lebih mudah didapat</li>
+                    <li>Pilih weapon yang sesuai dengan role karakter (DPS, Support, dll)</li>
+                </ul>
+
+                <h3>3. Talents</h3>
+                <p>Setiap karakter memiliki 3 talent utama yang harus di-level up:</p>
+                <ul>
+                    <li>Normal Attack</li>
+                    <li>Elemental Skill</li>
+                    <li>Elemental Burst</li>
+                </ul>
+
+                <div class="element-box">
+                    <strong>📊 Golden Ratio:</strong> Untuk DPS, targetkan Crit Rate : Crit DMG = 1:2 (contoh: 70% CR : 140% CD). Untuk Support, fokus pada Energy Recharge dan Elemental Mastery!
+                </div>
+
+                <h3>Karakter Populer per Role:</h3>
+                <div class="character-grid">
+                    <div class="character-card">
+                        <strong>Main DPS</strong>
+                        <p>Hu Tao, Ayaka, Ganyu, Neuvillette</p>
+                    </div>
+                    <div class="character-card">
+                        <strong>Sub DPS</strong>
+                        <p>Xiangling, Fischl, Xingqiu, Yelan</p>
+                    </div>
+                    <div class="character-card">
+                        <strong>Support</strong>
+                        <p>Kazuha, Venti, Sucrose, Nahida</p>
+                    </div>
+                    <div class="character-card">
+                        <strong>Healer/Shielder</strong>
+                        <p>Zhongli, Bennett, Kokomi, Baizhu</p>
+                    </div>
+                </div>
+
+                <button onclick="markComplete('genshin_3')" class="complete-btn">Tandai Selesai ✓</button>
+                <span class="status" id="status_genshin_3"></span>
+            </section>
+
+            <!-- Section 4: Progression & Resource Management -->
+            <section id="genshin_4" class="course-section">
+                <h2>4. Progression & Manajemen Resource 📈</h2>
+                
+                <p>Genshin Impact adalah game marathon, bukan sprint. Manajemen resource yang baik akan membuat progress Anda lebih efisien.</p>
+                
+                <h3>Daily Routine:</h3>
+                <ul>
+                    <li><strong>Daily Commissions:</strong> 4 quest harian = 60 Primogems + AR EXP</li>
+                    <li><strong>Resin Usage:</strong> Gunakan 160 Resin untuk Domain, Boss, atau Ley Lines</li>
+                    <li><strong>Parametric Transformer:</strong> Gunakan seminggu sekali</li>
+                    <li><strong>Teapot:</strong> Klaim Realm Currency untuk resources</li>
+                </ul>
+
+                <h3>Resource Priority:</h3>
+                <p><strong>1. Primogems (untuk Wishes):</strong></p>
+                <ul>
+                    <li>Daily Commissions</li>
+                    <li>Events (sumber terbesar!)</li>
+                    <li>Spiral Abyss (50-600 per 2 minggu)</li>
+                    <li>Exploration & Chests</li>
+                </ul>
+
+                <p><strong>2. Resin (untuk farming):</strong></p>
+                <ul>
+                    <li>Artifact Domains (AR 45+)</li>
+                    <li>Talent Books Domains</li>
+                    <li>Weapon Ascension Domains</li>
+                    <li>Weekly Bosses (diskon 30 resin untuk 3 pertama)</li>
+                </ul>
+
+                <p><strong>3. Mora & EXP Books:</strong></p>
+                <ul>
+                    <li>Ley Lines (jika mendesak)</li>
+                    <li>Events (lebih efisien)</li>
+                    <li>Battle Pass</li>
+                </ul>
+
+                <div class="element-box">
+                    <strong>💰 F2P Tips:</strong> Jangan farming artifacts sebelum AR 45! Fokus pada leveling karakter dan weapon dulu. Save Primogems untuk karakter yang benar-benar Anda inginkan. Quality over quantity!
+                </div>
+
+                <h3>Gacha System:</h3>
+                <p>Sistem Pity menjamin Anda mendapat 5-star:</p>
+                <ul>
+                    <li><strong>Character Banner:</strong> Pity di 90 pulls (soft pity mulai pull 74)</li>
+                    <li><strong>Weapon Banner:</strong> Pity di 80 pulls (soft pity mulai pull 65)</li>
+                    <li><strong>50/50 System:</strong> 5-star pertama punya 50% chance featured, jika kalah maka next dijamin featured</li>
+                </ul>
+
+                <button onclick="markComplete('genshin_4')" class="complete-btn">Tandai Selesai ✓</button>
+                <span class="status" id="status_genshin_4"></span>
+            </section>
+
+            <!-- Quiz -->
+            <section id="genshin_quiz_1" class="course-quiz">
+                <h2>🎯 Kuis Akhir - Test Your Teyvat Knowledge!</h2>
+                <p>Buktikan bahwa Anda sudah siap menjadi Traveler yang handal!</p>
+                
+                <div id="question-container">
+                    <div class="question-block">
+                        <p>1. Reaksi elemental apa yang terjadi ketika Pyro bertemu dengan Hydro?</p>
+                        <label><input type="radio" name="q1" value="melt"> Melt</label>
+                        <label><input type="radio" name="q1" value="vaporize"> Vaporize</label>
+                        <label><input type="radio" name="q1" value="overloaded"> Overloaded</label>
+                        <label><input type="radio" name="q1" value="frozen"> Frozen</label>
+                    </div>
+
+                    <div class="question-block">
+                        <p>2. Berapa jumlah karakter maksimal dalam satu party?</p>
+                        <label><input type="radio" name="q2" value="tiga"> 3 karakter</label>
+                        <label><input type="radio" name="q2" value="empat"> 4 karakter</label>
+                        <label><input type="radio" name="q2" value="lima"> 5 karakter</label>
+                        <label><input type="radio" name="q2" value="enam"> 6 karakter</label>
+                    </div>
+
+                    <div class="question-block">
+                        <p>3. Elemen apa yang terbaru ditambahkan ke Genshin Impact?</p>
+                        <label><input type="radio" name="q3" value="geo"> Geo</label>
+                        <label><input type="radio" name="q3" value="anemo"> Anemo</label>
+                        <label><input type="radio" name="q3" value="dendro"> Dendro</label>
+                        <label><input type="radio" name="q3" value="electro"> Electro</label>
+                    </div>
+
+                    <div class="question-block">
+                        <p>4. Pada Adventure Rank berapa sebaiknya mulai farming artifact 5-star?</p>
+                        <label><input type="radio" name="q4" value="ar30"> AR 30</label>
+                        <label><input type="radio" name="q4" value="ar40"> AR 40</label>
+                        <label><input type="radio" name="q4" value="ar45"> AR 45</label>
+                        <label><input type="radio" name="q4" value="ar50"> AR 50</label>
+                    </div>
+
+                    <div class="question-block">
+                        <p>5. Berapa jumlah Daily Commissions yang bisa diselesaikan setiap hari?</p>
+                        <label><input type="radio" name="q5" value="dua"> 2 quest</label>
+                        <label><input type="radio" name="q5" value="tiga"> 3 quest</label>
+                        <label><input type="radio" name="q5" value="empat"> 4 quest</label>
+                        <label><input type="radio" name="q5" value="lima"> 5 quest</label>
+                    </div>
+
+                    <div class="question-block">
+                        <p>6. Apa nama dunia tempat Genshin Impact berlangsung?</p>
+                        <label><input type="radio" name="q6" value="mondstadt"> Mondstadt</label>
+                        <label><input type="radio" name="q6" value="teyvat"> Teyvat</label>
+                        <label><input type="radio" name="q6" value="liyue"> Liyue</label>
+                        <label><input type="radio" name="q6" value="inazuma"> Inazuma</label>
+                    </div>
+
+                    <div class="question-block">
+                        <p>7. Golden ratio untuk Crit Rate : Crit DMG yang ideal adalah...</p>
+                        <label><input type="radio" name="q7" value="1:1"> 1:1</label>
+                        <label><input type="radio" name="q7" value="1:2"> 1:2</label>
+                        <label><input type="radio" name="q7" value="2:1"> 2:1</label>
+                        <label><input type="radio" name="q7" value="1:3"> 1:3</label>
+                    </div>
+                </div>
+
+                <button onclick="submitCourseQuiz()" class="quiz-btn">Kirim Jawaban 🎯</button>
+                <div id="quiz-result"></div>
+            </section>
+        </div>
+    </div>
+
+<script>
+    // [1] KONFIGURASI COURSE (Source of Truth)
+    const COURSE_ID = '693133d1b9375067dda27056';
+    const COURSE_SECTIONS = ['genshin_1', 'genshin_2', 'genshin_3', 'genshin_4'];
+    const COURSE_QUIZZES = ['genshin_quiz_1'];
+
+    // [2] KUNCI JAWABAN KUIS (KRITIS - Harus match dengan value di HTML)
+    const QUIZ_ANSWERS = {
+        'q1': 'vaporize',
+        'q2': 'empat',
+        'q3': 'dendro',
+        'q4': 'ar45',
+        'q5': 'empat',
+        'q6': 'teyvat',
+        'q7': '1:2'
+    };
+
+    // --- FUNGSI HELPER LOCALSTORAGE BARU ---
+
+    /**
+     * Mengambil data progress dari LocalStorage.
+     * Mengembalikan objek default jika data belum ada.
+     */
+    function getProgress() {
+        const progressData = localStorage.getItem(`course_progress_${COURSE_ID}`);
+        // Jika data ada, parse JSON, jika tidak, kembalikan objek kosong dengan array completedSections
+        return progressData ? JSON.parse(progressData) : { completedSections: [] };
+    }
+
+    /**
+     * Menyimpan data progress ke LocalStorage.
+     */
+    function saveProgress(data) {
+        localStorage.setItem(`course_progress_${COURSE_ID}`, JSON.stringify(data));
+    }
+
+    // --- FUNGSI UTAMA (Diubah total dari versi API) ---
+
+    // Helper: Update Progress Display (Sekarang dari LocalStorage)
+    function updateProgressDisplay() {
+        const data = getProgress();
+        const completed = data.completedSections || [];
+        const total = COURSE_SECTIONS.length + COURSE_QUIZZES.length;
+        const progress = Math.round((completed.length / total) * 100);
+
+        document.getElementById('progress-fill').style.width = progress + '%';
+        document.getElementById('progress-text').textContent = progress + '%';
+
+        // Update status untuk setiap section dan quiz
+        [...COURSE_SECTIONS, ...COURSE_QUIZZES].forEach(sectionId => {
+            const statusEl = document.getElementById(`status_${sectionId}`);
+            
+            // Khusus untuk quiz, kita harus mengecek apakah sudah selesai untuk menampilkan badge
+            if (sectionId === 'genshin_quiz_1') {
+                 const resultDiv = document.getElementById('quiz-result');
+                 if (completed.includes(sectionId)) {
+                    resultDiv.className = 'pass';
+                    resultDiv.textContent = `🎉 LULUS! Badge Traveler Master diraih! (Skor Tersimpan: ${data.quizScore || 'N/A'}%)`;
+                } else {
+                    resultDiv.className = '';
+                    resultDiv.textContent = '';
+                }
+            }
+
+
+            if (statusEl) { 
+                 if (completed.includes(sectionId)) {
+                    statusEl.textContent = '✓ Selesai';
+                    statusEl.className = 'status completed';
+                } else {
+                    statusEl.textContent = '';
+                    statusEl.className = 'status';
+                }
+            }
+        });
+    }
+
+    // Mark Section Complete (Sekarang ke LocalStorage)
+    function markComplete(sectionId) {
+        const data = getProgress();
+        
+        // Hanya tandai selesai jika belum ada
+        if (!data.completedSections.includes(sectionId)) {
+            data.completedSections.push(sectionId);
+            saveProgress(data);
+            updateProgressDisplay();
+            alert('✓ Materi berhasil ditandai selesai!');
+        } else {
+             alert('Materi ini sudah selesai sebelumnya.');
+        }
+    }
+
+    // Submit Quiz (Sekarang hanya logika lokal)
+    function submitCourseQuiz() {
+        const answers = {};
+        let allAnswered = true;
+
+        // Kumpulkan jawaban
+        Object.keys(QUIZ_ANSWERS).forEach(qName => {
+            const selected = document.querySelector(`input[name="${qName}"]:checked`);
+            if (selected) {
+                answers[qName] = selected.value;
+            } else {
+                allAnswered = false;
+            }
+        });
+
+        if (!allAnswered) {
+            alert('⚠️ Mohon jawab semua pertanyaan!');
+            return;
+        }
+
+        // Hitung skor
+        let correct = 0;
+        Object.keys(QUIZ_ANSWERS).forEach(qName => {
+            if (answers[qName] === QUIZ_ANSWERS[qName]) {
+                correct++;
+            }
+        });
+
+        const score = Math.round((correct / Object.keys(QUIZ_ANSWERS).length) * 100);
+        const passed = score >= 70;
+
+        // Tampilkan hasil
+        const resultDiv = document.getElementById('quiz-result');
+        resultDiv.className = passed ? 'pass' : 'fail';
+        resultDiv.textContent = `Skor Anda: ${score}% (${correct}/${Object.keys(QUIZ_ANSWERS).length} benar) - ${passed ? '🎉 LULUS! Badge Traveler Master diraih!' : '❌ Belum Lulus (minimal 70%)'}`;
+
+        // SIMPAN ke LocalStorage jika lulus
+        if (passed) {
+            const data = getProgress();
+            if (!data.completedSections.includes('genshin_quiz_1')) {
+                data.completedSections.push('genshin_quiz_1');
+                data.quizScore = score; // Simpan skor agar bisa ditampilkan saat refresh
+                saveProgress(data);
+                updateProgressDisplay();
+                setTimeout(() => {
+                    alert('🎉 Selamat! Anda telah menyelesaikan Genshin Impact Course dan mendapatkan badge Traveler Master!');
+                }, 500);
+            } else {
+                 alert('Anda sudah pernah lulus kuis ini.');
+            }
+        }
+    }
+
+    // [3] PANGGILAN AKHIR WAJIB
+    document.addEventListener('DOMContentLoaded', updateProgressDisplay);
+</script>
+</body>
+</html>

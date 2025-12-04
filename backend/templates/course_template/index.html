@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Konfigurasi Dasar HTML -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{COURSE_TITLE}}</title>
@@ -83,24 +82,18 @@ h1, h2 {
 <body>
 
   <header>
-    <!-- Judul Kursus -->
     <h1>{{COURSE_TITLE}}</h1>
-    <!-- Tempat untuk menampilkan status progres pengguna -->
-    <div id="progress-display">Progress: 0%</div>
+    <div id="progress-display">Progres: 0%</div>
   </header>
 
   <main>
-    <!-- Section 1: Konten Kursus -->
     <section id="section_1" class="course-section">
       <h2>1. Pengenalan</h2>
       <p>Ini adalah konten pertama Anda. Jelaskan dasar-dasar topik di sini.</p>
-      <!-- Tombol yang memanggil fungsi JavaScript saat diklik -->
       <button onclick="markComplete('section_1')" class="complete-btn">Tandai Selesai: Section 1</button>
-      <!-- Area untuk menampilkan status penyelesaian section -->
       <span class="status" id="status_section_1"></span>
     </section>
     
-    <!-- Section 2: Konten Kursus -->
     <section id="section_2" class="course-section">
       <h2>2. Konsep Inti</h2>
       <p>Selami topik utama. Sertakan kode, gambar, atau contoh di sini.</p>
@@ -108,7 +101,6 @@ h1, h2 {
       <span class="status" id="status_section_2"></span>
     </section>
 
-    <!-- Section 3: Konten Kursus -->
     <section id="section_3" class="course-section">
       <h2>3. Topik Lanjutan</h2>
       <p>Sediakan materi tambahan atau tips lanjutan untuk memperkaya pengetahuan siswa.</p>
@@ -116,19 +108,15 @@ h1, h2 {
       <span class="status" id="status_section_3"></span>
     </section>
 
-    <!-- Quiz Section -->
     <section id="quiz_1" class="course-quiz">
       <h2>Quiz Akhir</h2>
       <div id="question-container">
         <p>1. Apa hasil dari 2 + 2?</p>
-        <!-- Pilihan jawaban (Radio Buttons) -->
         <input type="radio" name="q1" value="3"> 3<br>
         <input type="radio" name="q1" value="4"> 4<br>
         <input type="radio" name="q1" value="5"> 5<br>
-        <!-- Tombol untuk mengirimkan quiz -->
         <button onclick="submitCourseQuiz()">Kirim Jawaban</button>
       </div>
-      <!-- Area untuk menampilkan hasil quiz setelah dikirim -->
       <div id="quiz-result"></div>
     </section>
   </main>
@@ -176,6 +164,12 @@ const courseAPI = {
         })
       });
       
+      if (response.status === 404) {
+          // Asumsi Course ID salah atau tidak ada
+          console.error("Course not found or invalid data received.");
+          return null;
+      }
+      
       const data = await response.json();
       
       // Jika pengguna mendapatkan lencana (badge), tampilkan notifikasi
@@ -188,6 +182,7 @@ const courseAPI = {
       return data;
     } catch (error) {
       console.error('Error marking section:', error);
+      alert('Gagal mencatat progres section.');
     }
   },
   
@@ -213,6 +208,10 @@ const courseAPI = {
         })
       });
       
+      if (!response.ok) {
+           throw new Error('Gagal mengirim hasil kuis.');
+      }
+      
       const data = await response.json();
       
       if (data.badgeEarned) {
@@ -220,9 +219,10 @@ const courseAPI = {
       }
       
       await updateProgressDisplay(); // Memperbarui tampilan progres
-      return data;
+      return data; // Mengembalikan { score, passed, badgeEarned }
     } catch (error) {
       console.error('Error submitting quiz:', error);
+      alert(error.message || 'Gagal mengirim hasil kuis.');
     }
   },
   
@@ -238,9 +238,14 @@ const courseAPI = {
         }
       });
       
+      if (response.status === 404) {
+        return { completedSections: [], quizResults: [], progressPercentage: 0 }; // Return objek kosong jika belum dimulai
+      }
+      
       if (response.ok) {
         return await response.json();
       }
+      
       return null;
     } catch (error) {
       console.error('Error getting progress:', error);
@@ -260,23 +265,19 @@ function calculateQuizScore() {
   // Mengambil jawaban yang dicentang oleh pengguna
   const q1_answer = document.querySelector('input[name="q1"]:checked')?.value;
 
-  // Membandingkan dengan kunci jawaban
+  // Membandingkan dengan kunci jawaban. Asumsi hanya 1 soal.
   if (q1_answer === QUIZ_ANSWERS['q1']) {
     score += 1; // Menambah skor jika jawaban benar
   }
   
-  return score;
+  return score; // Skor maksimal 1
 }
 
 // Handler utama saat tombol 'Tandai Selesai' diklik
 async function markComplete(sectionId) {
   const result = await courseAPI.markSectionComplete(sectionId); // Panggil API untuk menandai selesai
   
-  // Update UI secara lokal setelah sukses
-  if (result) {
-    document.getElementById(`status_${sectionId}`).textContent = '✅ Selesai';
-    document.getElementById(`status_${sectionId}`).classList.add('completed');
-  }
+  // updateProgressDisplay() sudah dipanggil di courseAPI.markSectionComplete
 }
 
 // Handler utama saat tombol 'Kirim Jawaban Quiz' diklik
@@ -287,13 +288,14 @@ async function submitCourseQuiz() {
   const result = await courseAPI.submitQuiz(quizId, score); // Panggil API untuk mengirim skor
   const resultDiv = document.getElementById('quiz-result');
 
-  // Tampilkan hasil quiz di UI
+  // Tampilkan hasil quiz di UI (setelah updateProgressDisplay selesai)
   if (result) {
     resultDiv.innerHTML = `<strong>Hasil Anda: ${score} dari 1.</strong><br>`;
-    if (result.isCompleted) {
-      resultDiv.innerHTML += 'Kuis ini sudah selesai dan tersimpan.';
+    // Cek properti 'passed' dari response API
+    if (result.passed) {
+      resultDiv.innerHTML += '<span style="color: green; font-weight: bold;">Selamat! Anda Lulus Kuis.</span>';
     } else {
-      resultDiv.innerHTML += 'Gagal menyimpan hasil kuis.';
+      resultDiv.innerHTML += '<span style="color: red; font-weight: bold;">Anda Gagal. Coba Lagi!</span>';
     }
   } else {
     resultDiv.innerHTML = 'Gagal mengirim hasil kuis.';
@@ -302,21 +304,31 @@ async function submitCourseQuiz() {
 
 // Fungsi utama untuk memperbarui seluruh tampilan progres di halaman
 async function updateProgressDisplay() {
-  const progress = await courseAPI.getProgress(); // Ambil progres terbaru dari API
+  // Jika getProgress() gagal, ia mengembalikan { completedSections: [], quizResults: [], progressPercentage: 0 }
+  const progress = await courseAPI.getProgress(); 
   const display = document.getElementById('progress-display');
   
   if (!progress) {
-    display.textContent = 'Progres: Login diperlukan';
+    display.textContent = 'Progres: Gagal memuat data';
     return;
   }
+  
+  // Ambil daftar quiz yang sudah LULUS (passed: true)
+  const passedQuizzes = (progress.quizResults || [])
+     .filter(r => r.passed)
+     .map(r => r.quizId);
   
   // Perhitungan Progres
   const totalItems = COURSE_SECTIONS.length + COURSE_QUIZZES.length; 
   const sectionsDone = progress.completedSections.filter(s => COURSE_SECTIONS.includes(s)).length;
-  const quizzesDone = progress.completedQuizzes.filter(q => COURSE_QUIZZES.includes(q)).length;
+  // FIX KRUSIAL: Gunakan passedQuizzes
+  const quizzesDone = passedQuizzes.filter(qId => COURSE_QUIZZES.includes(qId)).length;
   const itemsDone = sectionsDone + quizzesDone;
   
-  const percentage = totalItems > 0 ? Math.round((itemsDone / totalItems) * 100) : 0;
+  // Menggunakan progressPercentage dari backend jika tersedia, jika tidak hitung di frontend
+  const percentage = progress.progressPercentage !== undefined 
+      ? progress.progressPercentage 
+      : (totalItems > 0 ? Math.round((itemsDone / totalItems) * 100) : 0);
   
   // Tampilkan persentase progres
   display.textContent = `Progres: ${percentage}% (${itemsDone}/${totalItems} item)`;
@@ -324,24 +336,45 @@ async function updateProgressDisplay() {
   // Update status visual untuk setiap section
   COURSE_SECTIONS.forEach(sectionId => {
     const statusEl = document.getElementById(`status_${sectionId}`);
+    const buttonEl = document.querySelector(`#${sectionId} .complete-btn`);
     if (statusEl) {
       if (progress.completedSections.includes(sectionId)) {
         statusEl.textContent = '✅ Selesai';
         statusEl.classList.add('completed');
         statusEl.classList.remove('incomplete');
+        if (buttonEl) buttonEl.disabled = true;
       } else {
         statusEl.textContent = '⏳ Belum Selesai';
         statusEl.classList.add('incomplete');
         statusEl.classList.remove('completed');
+        if (buttonEl) buttonEl.disabled = false;
       }
     }
   });
 
   // Update status Quiz
   const quizResultDiv = document.getElementById('quiz-result');
+  const questionContainer = document.getElementById('question-container');
   const quizId = COURSE_QUIZZES[0];
-  if (progress.completedQuizzes.includes(quizId)) {
-    quizResultDiv.innerHTML = '<strong>Kuis ini sudah selesai dan tersimpan di riwayat Anda.</strong>';
+  
+  // FIX KRUSIAL: Cek apakah quizId ada di daftar passedQuizzes
+  if (passedQuizzes.includes(quizId)) {
+    quizResultDiv.innerHTML = '<strong>✨ Kuis ini sudah selesai dan tersimpan di riwayat Anda. (LULUS)</strong>';
+    if (questionContainer) {
+      questionContainer.style.display = 'none'; // Sembunyikan form jika sudah lulus
+    }
+  } else {
+    // Jika belum lulus, tampilkan form
+    if (questionContainer) {
+      questionContainer.style.display = 'block';
+    }
+    // Cek apakah user pernah mencoba tapi gagal
+    const failedAttempt = progress.quizResults.find(r => r.quizId === quizId && !r.passed);
+    if (failedAttempt) {
+       quizResultDiv.innerHTML = '<span style="color: red; font-weight: bold;">Anda belum lulus. Coba lagi!</span>';
+    } else {
+       quizResultDiv.innerHTML = '';
+    }
   }
 }
 

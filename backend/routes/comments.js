@@ -15,19 +15,27 @@ router.get('/', (req, res) => {
 // Menambahkan Komentar Baru
 router.post('/', auth, async (req, res) => { // Memerlukan autentikasi (auth)
   try {
-    const { courseId, comment } = req.body;
+    // Memastikan kita mengambil 'comment' dari req.body, yang merupakan isi komentar.
+    const { courseId, comment } = req.body; 
+
+    // Guard Clause: Pastikan komentar tidak kosong
+    if (!comment || comment.trim() === '') {
+        return res.status(400).json({ error: 'Comment body cannot be empty.' });
+    }
 
     // Membuat objek Komentar baru
     const newComment = new Comment({
       courseId,
       userId: req.user._id,        // ID pengguna diambil dari token JWT (req.user)
       username: req.user.username, // Username juga diambil dari req.user
-      comment
+      comment // Gunakan properti 'comment' (isi komentar)
     });
 
     await newComment.save();
     res.status(201).json(newComment); // 201 Created
   } catch (error) {
+    // Tambahkan log detail error di server untuk debugging lebih lanjut
+    console.error("Error creating comment:", error); 
     res.status(400).json({ error: error.message });
   }
 });
@@ -57,16 +65,22 @@ router.put('/:id', auth, async (req, res) => { // Memerlukan autentikasi (auth)
 
     // Periksa apakah pengguna yang login adalah pemilik komentar
     if (comment.userId.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ error: 'Not authorized' }); // 403 Forbidden
+      return res.status(403).json({ error: 'Not authorized to edit this comment' }); // 403 Forbidden
+    }
+    
+    // Pastikan komentar baru tidak kosong
+    if (!req.body.comment || req.body.comment.trim() === '') {
+        return res.status(400).json({ error: 'Comment body cannot be empty.' });
     }
 
     // Perbarui isi komentar dan waktu update
-    comment.comment = req.body.comment;
+    comment.comment = req.body.comment; 
     comment.updatedAt = Date.now();
     await comment.save();
 
     res.json(comment);
   } catch (error) {
+    console.error("Error updating comment:", error);
     res.status(400).json({ error: error.message });
   }
 });
@@ -82,13 +96,18 @@ router.delete('/:id', auth, async (req, res) => { // Memerlukan autentikasi (aut
     }
 
     // Periksa otorisasi: pemilik komentar ATAU admin
-    if (comment.userId.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
-      return res.status(403).json({ error: 'Not authorized' }); // 403 Forbidden
+    // Catatan: Asumsi middleware 'auth' telah mengisi req.user dengan user data, termasuk 'role'.
+    const isOwner = comment.userId.toString() === req.user._id.toString();
+    const isAdmin = req.user.role === 'admin';
+
+    if (!isOwner && !isAdmin) {
+      return res.status(403).json({ error: 'Not authorized to delete this comment' }); // 403 Forbidden
     }
 
-    await comment.deleteOne(); // Hapus komentar
+    await Comment.deleteOne({ _id: req.params.id }); // Hapus komentar
     res.json({ message: 'Comment deleted successfully' });
   } catch (error) {
+    console.error("Error deleting comment:", error);
     res.status(400).json({ error: error.message });
   }
 });

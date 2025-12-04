@@ -1,25 +1,23 @@
 const express = require('express');
-const User = require('../models/User'); // Model Mongoose untuk data User
-const { auth, adminAuth } = require('../middleware/auth'); // Middleware untuk otentikasi user dan admin
+const User = require('../models/User');
+const { auth, adminAuth } = require('../middleware/auth');
 
-const router = express.Router(); // Membuat instance router Express
+const router = express.Router();
 
 
-// Route GET /api/users: Mendapatkan semua user (Hanya Admin)
+// Get all users (Admin only)
 router.get('/', adminAuth, async (req, res) => {
   try {
-    // Cari semua dokumen User
-    const users = await User.find().select('-password'); // Kecualikan field 'password' dari hasil
+    const users = await User.find().select('-password');
     res.json(users);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 });
 
-// Route GET /api/users/:id: Mendapatkan data user berdasarkan ID
+// Get user by ID
 router.get('/:id', auth, async (req, res) => {
   try {
-    // Cari user berdasarkan ID dari parameter URL
     const user = await User.findById(req.params.id).select('-password');
     
     if (!user) {
@@ -32,29 +30,25 @@ router.get('/:id', auth, async (req, res) => {
   }
 });
 
-// Route PUT /api/users/:id: Mengubah data user
+// Update user
 router.put('/:id', auth, async (req, res) => {
   try {
-    // 1. Otorisasi: Hanya izinkan user mengupdate data mereka sendiri, atau Admin mengupdate siapa pun
+    // Only allow user to update their own data, or admin to update any
     if (req.user._id.toString() !== req.params.id && req.user.role !== 'admin') {
-      // Jika ID user tidak cocok dengan ID di params DAN user bukan admin
-      return res.status(403).json({ error: 'Not authorized' }); // Status 403 (Forbidden)
+      return res.status(403).json({ error: 'Not authorized' });
     }
 
     const { username, email, password } = req.body;
-    const updates = {}; // Objek untuk menampung perubahan
+    const updates = {};
 
-    // Hanya masukkan field yang ada di body request
     if (username) updates.username = username;
     if (email) updates.email = email;
-    // PENTING: Jika password di-update, Model User harus memiliki pre-save hook untuk melakukan hashing!
-    if (password) updates.password = password; 
+    if (password) updates.password = password;
 
-    // Cari dan update user berdasarkan ID
     const user = await User.findByIdAndUpdate(
       req.params.id,
       updates,
-      { new: true } // Mengembalikan dokumen yang sudah di-update
+      { new: true }
     ).select('-password');
 
     if (!user) {
@@ -67,10 +61,9 @@ router.put('/:id', auth, async (req, res) => {
   }
 });
 
-// Route DELETE /api/users/:id: Menghapus user (Hanya Admin)
+// Delete user (Admin only)
 router.delete('/:id', adminAuth, async (req, res) => {
   try {
-    // Cari dan hapus user berdasarkan ID
     const user = await User.findByIdAndDelete(req.params.id);
     
     if (!user) {
@@ -83,4 +76,4 @@ router.delete('/:id', adminAuth, async (req, res) => {
   }
 });
 
-module.exports = router; // Ekspor router agar dapat digunakan di aplikasi Express utama
+module.exports = router;
