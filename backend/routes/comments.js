@@ -4,6 +4,12 @@ const { auth, adminAuth } = require('../middleware/auth');
 
 const router = express.Router();
 
+
+// Health check / Base route for /api/comments
+router.get('/', (req, res) => {
+  res.json({ message: 'Comments API is ready.' });
+});
+
 // Add comment
 router.post('/', auth, async (req, res) => {
   try {
