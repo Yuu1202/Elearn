@@ -37,6 +37,15 @@ const courseSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
   },
+  // START FIX KRUSIAL: TAMBAH metadata UNTUK PROGRESS
+  metadata: {
+    totalSections: { // Jumlah total section (WAJIB DIISI DI DB)
+      type: Number,
+      default: 0
+    },
+    quizIds: [String] // Array ID quiz (misal: ['quiz_1'])
+  },
+  // END FIX KRUSIAL
   createdAt: {
     type: Date,
     default: Date.now

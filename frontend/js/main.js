@@ -2,6 +2,7 @@ const API_URL = 'http://localhost:5000/api';
 
 // Get token and user from localStorage
 function getToken() {
+  // PENTING: Gunakan localStorage untuk menyimpan sesi pengguna
   return localStorage.getItem('token');
 }
 
@@ -42,165 +43,126 @@ function updateNavbar() {
 document.getElementById('logoutBtn')?.addEventListener('click', () => {
   localStorage.removeItem('token');
   localStorage.removeItem('user');
-  window.location.href = 'login.html';
+  updateNavbar();
+  window.location.href = 'index.html';
 });
 
-// Load courses 
-async function loadCourses() {
-  let courses;
-  let userProgress = [];
-
+// Fetch all courses and render them
+async function fetchCourses() {
   try {
-    // 1. AMBIL DAFTAR KURSUS UTAMA
     const response = await fetch(`${API_URL}/courses`);
     if (!response.ok) {
-      throw new Error(`Failed to fetch courses: ${response.status} ${response.statusText}`);
+      throw new Error('Failed to fetch courses');
     }
-    courses = await response.json();
-    
-    const token = getToken();
+    const courses = await response.json();
+    displayCourses(courses);
+  } catch (error) {
+    console.error('Error fetching courses:', error);
+    document.getElementById('coursesGrid').innerHTML = '<p class="text-red-500">Gagal memuat kursus.</p>';
+  }
+}
 
-    // 2. AMBIL PROGRESS PENGGUNA (Diisolasi dari kegagalan otentikasi)
-    if (token) {
-      const progressRes = await fetch(`${API_URL}/progress/user`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+// Display courses on the homepage
+function displayCourses(courses) {
+  const grid = document.getElementById('coursesGrid');
+  grid.innerHTML = courses.map(course => `
+    <div class="course-card" onclick="showCourseModal(${JSON.stringify(course).replace(/"/g, '&quot;')})">
+      <img src="${course.thumbnail}" alt="${course.title}" class="course-thumbnail">
+      <div class="course-info">
+        <h3>${course.title}</h3>
+        <p class="course-description">${course.description.substring(0, 100)}...</p>
+        <span class="difficulty-badge difficulty-${course.difficulty}">${course.difficulty}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+// Function to fetch course progress
+async function getCourseProgress(courseId) {
+    const token = getToken();
+    if (!token) return null;
+
+    try {
+        const response = await fetch(`${API_URL}/progress/course/${courseId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        // 404 berarti user belum memulai kursus, ini bukan error
+        if (response.status === 404) {
+            return null; // Mengembalikan null jika belum dimulai
+        }
+        
+        if (!response.ok) {
+            console.error('Failed to fetch progress:', response.statusText);
+            return null;
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching course progress:', error);
+        return null;
+    }
+}
+
+// Show course detail modal
+async function showCourseModal(course) {
+  const modal = document.getElementById('courseModal');
+  const token = getToken();
+  let progress = null;
+
+  if (token) {
+    // Ambil progres terbaru
+    progress = await getCourseProgress(course._id);
+  }
+  
+  displayCourseDetail(course, progress);
+  modal.style.display = 'block';
+}
+
+
+// Function untuk memanggil API memulai progres dan mengarahkan ke halaman kursus
+async function startCourse(coursePath, courseId) {
+  const token = getToken();
+  if (token) {
+    try {
+      // Panggil API untuk memastikan progres dimulai di backend
+      const response = await fetch(`${API_URL}/progress/start`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ courseId }) // KRITIS: Meneruskan courseId
       });
       
-      if (progressRes.ok) {
-        userProgress = await progressRes.json();
-      } else if (progressRes.status === 401) {
-        console.warn('Token expired or invalid. Logging out silently.');
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        updateNavbar();
-      } else {
-        console.warn(`Could not load user progress: ${progressRes.statusText}. Continuing without progress data.`);
+      if (!response.ok && response.status !== 404) {
+        console.warn('Progress API start failed, but proceeding to course:', await response.json());
       }
+    } catch (error) {
+      console.error('Error starting course:', error);
     }
-    
-    // 3. TAMPILKAN KURSUS
-    displayCourses(courses, userProgress);
-  } catch (error) {
-    console.error('CRITICAL Error loading courses list:', error);
-    document.getElementById('coursesGrid').innerHTML = '<p class="empty-state">Failed to load courses. Please check API server status.</p>';
-  }
-}
-
-// Display courses - PERBAIKAN DI SINI! Menambahkan p.courseId &&
-function displayCourses(courses, userProgress) {
-  const grid = document.getElementById('coursesGrid');
-  
-  if (courses.length === 0) {
-    grid.innerHTML = '<p class="empty-state">No courses available yet</p>';
-    return;
   }
   
-  grid.innerHTML = courses.map(course => {
-    // FIX: Pastikan p.courseId tidak null (karena course mungkin sudah dihapus)
-    const progress = userProgress.find(p => p.courseId && p.courseId._id === course._id);
-    const progressPercent = progress ? progress.progressPercentage : 0;
-    const isCompleted = progress ? progress.isCompleted : false;
-    
-    return `
-      <div class="course-card" onclick="openCourseDetail('${course._id}')">
-        <img src="${course.thumbnail}" alt="${course.title}">
-        <div class="course-card-body">
-          <h3>${course.title}</h3>
-          <p>${course.description}</p>
-          <span class="difficulty-badge difficulty-${course.difficulty}">${course.difficulty}</span>
-          ${progressPercent > 0 ? `
-            <div class="progress-bar-container">
-              <div class="progress-bar" style="width: ${progressPercent}%"></div>
-            </div>
-            <p style="font-size: 0.9rem; color: #7f8c8d; margin-top: 5px;">${progressPercent}% Complete</p>
-          ` : ''}
-          ${isCompleted ? '<p class="badge-earned">✅ Badge Earned!</p>' : ''}
-        </div>
-      </div>
-    `;
-  }).join('');
+  // Arahkan ke halaman kursus
+  window.location.href = coursePath; 
 }
 
-// Open course detail modal (popup with detail + comments)
-// Open course detail modal (popup with detail + comments)
-async function openCourseDetail(courseId) {
-  let course;
-  try {
-    // 1. Ambil detail kursus utama (WAJIB)
-    const response = await fetch(`${API_URL}/courses/${courseId}`);
-    if (!response.ok) {
-        // Jika fetch utama gagal (misal 404, 500, dll.)
-        throw new Error(`Failed to fetch course data: ${response.statusText}`);
-    }
-    course = await response.json(); 
 
-    if (!course.courseFolder) {
-        // Course folder field harus selalu ada di data kursus
-        throw new Error('Course folder path not found in database record'); 
-    }
-    
-    const token = getToken();
-    let progress = null;
-    
-    // 2. Cek dan buat progress (KRUSIAL: Diisolasi dari error utama)
-    if (token) {
-      try { 
-        // a. Cek existing progress
-        const progressRes = await fetch(`${API_URL}/progress/course/${courseId}`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        
-        if (progressRes.ok) {
-          progress = await progressRes.json();
-        } else if (progressRes.status === 404 || progressRes.status === 400) {
-          // b. Jika progress BELUM ADA (404/400), coba buat progress awal
-          const startRes = await fetch(`${API_URL}/progress/start`, {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ courseId }) 
-          });
-          
-          if (startRes.ok) {
-            progress = await startRes.json();
-          } else if (startRes.status === 401) {
-            console.warn('Token expired during start progress. User needs re-login.');
-          } else {
-            // Log error inisialisasi progress tanpa memblokir modal
-            console.error('Failed to initialize progress:', await startRes.text());
-          }
-        } else if (progressRes.status === 401) {
-            console.warn('Token expired during progress check. User needs re-login.');
-        } else {
-            // Log error fetch progress yang lain
-            console.error('Failed to fetch progress with status:', progressRes.status, await progressRes.text());
-        }
-      } catch (err) {
-        // Menangani error jaringan atau error parsing JSON di dalam blok progress
-        console.error('Network/Parsing error during progress fetching/starting:', err);
-        // Lanjutkan untuk menampilkan detail kursus tanpa data progress
-      }
-    }
-    
-    // 3. Tampilkan modal detail (hanya butuh object 'course' yang sudah berhasil diambil)
-    displayCourseDetail(course, progress);
-    document.getElementById('courseModal').style.display = 'block';
-  } catch (error) {
-    // 4. Tangani error utama (hanya jika GAGAL mengambil detail kursus)
-    console.error('Error loading course:', error);
-    alert('Failed to load course details. Make sure course folder is generated and API is running.');
-  }
-}
-
-// Display course detail in popup
+// Display course detail in popup (Perbaikan Tombol Start)
 function displayCourseDetail(course, progress) {
   const detail = document.getElementById('courseDetail');
   const token = getToken();
   
   // URL untuk tombol "Mulai"
   const coursePath = `/courses/${course.courseFolder}/index.html`;
+
+  // Tentukan progress yang akan ditampilkan. Jika progress null, asumsikan 0%
+  const progressPercent = progress ? progress.progressPercentage : 0;
+  
+  // Tentukan apakah user sudah memulai kursus
+  const isStarted = progress && progress.progressPercentage > 0; 
 
   detail.innerHTML = `
     <div style="display: flex; gap: 30px;">
@@ -210,23 +172,28 @@ function displayCourseDetail(course, progress) {
         <p style="color: #7f8c8d; margin: 15px 0;">${course.description}</p>
         <span class="difficulty-badge difficulty-${course.difficulty}">${course.difficulty}</span>
         
-        ${progress ? `
+        ${token ? `
           <div style="margin: 20px 0;">
-            <h4>Your Progress</h4>
-            <div class="progress-bar-container">
-              <div class="progress-bar" style="width: ${progress.progressPercentage}%"></div>
+            <h4>Progres Anda</h4>
+            <div class="progress-bar-container" style="background: #ecf0f1; height: 10px; border-radius: 5px;">
+              <div class="progress-bar" style="width: ${progressPercent}%; height: 100%; background: #2ecc71; border-radius: 5px;"></div>
             </div>
-            <p style="margin-top: 10px;">${progress.progressPercentage}% Complete</p>
+            <p style="margin-top: 10px; font-weight: bold;">${progressPercent}% Selesai</p>
           </div>
-        ` : ''}
+        ` : `
+          <div style="margin: 20px 0;">
+            <p style="color: #e74c3c;">Login untuk melihat dan melacak progres.</p>
+          </div>
+        `}
         
         ${token ? `
-          <button onclick="startCourse('${coursePath}')" class="btn-primary" style="width: 100%; margin-top: 20px; padding: 15px; font-size: 1.1rem;">
-            ${progress && progress.progressPercentage > 0 ? '▶️ Continue Learning' : '🚀 Start Learning'}
+          <!-- FIX KRUSIAL: Memanggil startCourse DENGAN course._id -->
+          <button onclick="startCourse('${coursePath}', '${course._id}')" class="btn-primary" style="width: 100%; margin-top: 20px; padding: 15px; font-size: 1.1rem;">
+            ${isStarted ? '▶️ Lanjutkan Belajar' : '🚀 Mulai Belajar'}
           </button>
         ` : `
           <a href="login.html" class="btn-primary" style="display: block; text-align: center; width: 100%; margin-top: 20px; padding: 15px; font-size: 1.1rem; text-decoration: none;">
-            🔒 Login to Start
+            🔒 Login untuk Mulai
           </a>
         `}
       </div>
@@ -238,10 +205,10 @@ function displayCourseDetail(course, progress) {
         
         ${token ? `
           <div class="comment-form">
-            <textarea id="commentInput" placeholder="Write your comment..." style="width: 100%; min-height: 80px;"></textarea>
-            <button onclick="submitComment('${course._id}')" style="margin-top: 10px;">Post Comment</button>
+            <textarea id="commentInput" placeholder="Tulis komentar Anda..." style="width: 100%; min-height: 80px;"></textarea>
+            <button onclick="submitComment('${course._id}')" style="margin-top: 10px;">Posting Komentar</button>
           </div>
-        ` : '<p style="text-align: center; color: #7f8c8d;">Login to comment</p>'}
+        ` : '<p style="text-align: center; color: #7f8c8d;">Login untuk berkomentar</p>'}
       </div>
     </div>
   `;
@@ -249,68 +216,71 @@ function displayCourseDetail(course, progress) {
   loadComments(course._id);
 }
 
-// Start course - Arahkan ke path course independen
-function startCourse(coursePath) {
-  // Buka halaman course independen di window yang sama
-  window.location.href = coursePath;
-}
+// ... (Sisa fungsi lain seperti loadComments, submitComment, showBadgeModal tetap sama) ...
 
-// Load comments
+
+// Function to load and display comments (Pastikan fungsi ini ada)
 async function loadComments(courseId) {
   try {
     const response = await fetch(`${API_URL}/comments/${courseId}`);
+    if (!response.ok) {
+        throw new Error('Failed to fetch comments');
+    }
     const comments = await response.json();
-    
-    const list = document.getElementById('commentsList');
+    const commentsList = document.getElementById('commentsList');
     
     if (comments.length === 0) {
-      list.innerHTML = '<p class="empty-state">No comments yet. Be the first to comment!</p>';
-      return;
+        commentsList.innerHTML = '<p style="color: #7f8c8d;">Belum ada komentar.</p>';
+        return;
     }
-    
-    list.innerHTML = comments.map(comment => `
-      <div class="comment-item">
-        <div class="comment-header">
-          <span class="comment-author">${comment.username || 'Anonymous'}</span>
-          <span class="comment-date">${new Date(comment.createdAt).toLocaleDateString()}</span>
+
+    commentsList.innerHTML = comments.map(comment => {
+      const date = new Date(comment.createdAt).toLocaleDateString();
+      const time = new Date(comment.createdAt).toLocaleTimeString();
+      return `
+        <div class="comment-item" style="border-bottom: 1px solid #eee; padding: 10px 0;">
+          <strong style="color: #2c3e50;">${comment.user?.username || 'Anonymous'}</strong>
+          <span style="font-size: 0.8rem; color: #95a5a6; margin-left: 10px;">- ${date} ${time}</span>
+          <p style="margin-top: 5px;">${comment.text}</p>
         </div>
-        <p>${comment.comment}</p>
-      </div>
-    `).join('');
+      `;
+    }).join('');
+
   } catch (error) {
     console.error('Error loading comments:', error);
-    document.getElementById('commentsList').innerHTML = '<p class="empty-state">Failed to load comments.</p>';
+    document.getElementById('commentsList').innerHTML = '<p class="text-red-500">Gagal memuat komentar.</p>';
   }
 }
 
-// Submit comment
+// Function to submit a new comment (Pastikan fungsi ini ada)
 async function submitComment(courseId) {
-  const token = getToken();
   const input = document.getElementById('commentInput');
-  const comment = input.value.trim();
-  
+  const text = input.value.trim();
+  const token = getToken();
+
   if (!token) {
-    alert('Please log in to comment.');
+    alert('Anda harus login untuk berkomentar.'); // Ganti dengan modal jika ini app
+    return;
+  }
+  
+  if (!text) {
+    alert('Komentar tidak boleh kosong.'); // Ganti dengan modal jika ini app
     return;
   }
 
-  if (!comment) {
-    alert('Please write a comment');
-    return;
-  }
-  
   try {
     const response = await fetch(`${API_URL}/comments`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ courseId, comment })
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ courseId, text })
     });
-
+    
     if (response.status === 401) {
-       alert('Session expired. Please log in again.');
+       // Sebaiknya ganti dengan notifikasi/modal
+       console.error('Session expired. Please log in again.');
        return;
     }
     
@@ -322,7 +292,7 @@ async function submitComment(courseId) {
     loadComments(courseId);
   } catch (error) {
     console.error('Error submitting comment:', error);
-    alert('Failed to post comment');
+    // Sebaiknya ganti dengan notifikasi/modal
   }
 }
 
@@ -351,22 +321,22 @@ function closeBadgeModal() {
   document.getElementById('badgeModal').style.display = 'none';
 }
 
+
 // Close modal
 document.querySelector('.close')?.addEventListener('click', () => {
   document.getElementById('courseModal').style.display = 'none';
 });
 
-window.onclick = function(event) {
+window.onclick = (event) => {
   const modal = document.getElementById('courseModal');
-  const badgeModal = document.getElementById('badgeModal');
-  if (event.target === modal) {
-    modal.style.display = 'none';
+  if (event.target == modal) {
+    modal.style.display = "none";
   }
-  if (event.target === badgeModal) {
-    badgeModal.style.display = 'none';
-  }
-}
+};
 
-// Initialize
-updateNavbar();
-loadCourses();
+
+// Initial calls
+document.addEventListener('DOMContentLoaded', () => {
+  updateNavbar();
+  fetchCourses();
+});

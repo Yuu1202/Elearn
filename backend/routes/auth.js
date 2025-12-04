@@ -1,37 +1,39 @@
 const express = require('express');
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
-const { auth } = require('../middleware/auth');
+const jwt = require('jsonwebtoken');        // Digunakan untuk membuat JSON Web Token (JWT)
+const User = require('../models/User');     // Model Mongoose untuk Pengguna
+const { auth } = require('../middleware/auth'); // Middleware untuk memverifikasi token
 
 const router = express.Router();
 
-// Register
+// --- Endpoint /api/auth/register ---
+// Pendaftaran Pengguna Baru
 router.post('/register', async (req, res) => {
   try {
     const { username, email, password } = req.body;
 
-    // Check if user exists
+    // 1. Periksa apakah pengguna dengan email atau username sudah ada
     const existingUser = await User.findOne({ $or: [{ email }, { username }] });
     if (existingUser) {
-      return res.status(400).json({ error: 'User already exists' });
+      return res.status(400).json({ error: 'User already exists' }); // 400 Bad Request
     }
 
-    // Create user (password plain text)
+    // 2. Buat objek User baru (CATATAN: Password disimpan sebagai plain text)
     const user = new User({
       username,
       email,
-      password, // Plain text - TIDAK di-hash
+      password, 
       role: 'user'
     });
 
-    await user.save();
+    await user.save(); // Simpan ke database
 
-    // Generate token
+    // 3. Buat JSON Web Token (JWT) untuk sesi
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-      expiresIn: '7d'
+      expiresIn: '7d' // Token berlaku selama 7 hari
     });
 
-    res.status(201).json({
+    // 4. Kirim token dan data pengguna (tanpa password)
+    res.status(201).json({ // 201 Created
       token,
       user: {
         _id: user._id,
@@ -46,27 +48,29 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// Login
+// --- Endpoint /api/auth/login ---
+// Proses Masuk Pengguna
 router.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body;
 
-    // Find user
+    // 1. Cari pengguna berdasarkan username
     const user = await User.findOne({ username });
     if (!user) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      return res.status(401).json({ error: 'Invalid credentials' }); // 401 Unauthorized
     }
 
-    // Check password (plain text comparison)
+    // 2. Periksa password (plain text comparison)
     if (user.password !== password) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    // Generate token
+    // 3. Buat JSON Web Token (JWT) untuk sesi
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
       expiresIn: '7d'
     });
 
+    // 4. Kirim token dan data pengguna
     res.json({
       token,
       user: {
@@ -82,9 +86,11 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// Get current user
+// --- Endpoint /api/auth/me ---
+// Mendapatkan Data Pengguna Saat Ini
 router.get('/me', auth, async (req, res) => {
   try {
+    // Middleware 'auth' sudah memastikan req.user terisi dengan data pengguna
     res.json({
       user: {
         _id: req.user._id,

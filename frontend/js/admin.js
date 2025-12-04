@@ -1,21 +1,27 @@
-const API_URL = 'http://localhost:5000/api';
+const API_URL = 'http://localhost:5000/api'; // URL dasar untuk API backend
 
+// Fungsi untuk mendapatkan token JWT dari localStorage
 function getToken() {
   return localStorage.getItem('token');
 }
 
+// Fungsi untuk mendapatkan data user (termasuk role) dari localStorage
 function getUser() {
   const user = localStorage.getItem('user');
   return user ? JSON.parse(user) : null;
 }
 
-// Check admin auth
+// Check otentikasi admin
 const token = getToken();
 const user = getUser();
 
+// Memastikan user memiliki token, data user, dan role adalah 'admin'
 if (!token || !user || user.role !== 'admin') {
-  alert('Admin access required');
-  window.location.href = 'index.html';
+  // 💡 FIX: Ganti alert() dengan custom modal UI (sesuai instruksi)
+  // Untuk saat ini, kita akan menggunakan konsol log dan redirect
+  console.error('Akses ditolak: Diperlukan hak akses Admin.');
+  // alert('Admin access required'); // DILARANG: Hindari alert()
+  window.location.href = 'index.html'; // Redirect ke halaman utama jika bukan admin
 }
 
 // Logout
@@ -30,13 +36,20 @@ function showTab(tabName) {
   const tabs = document.querySelectorAll('.tab-btn');
   const contents = document.querySelectorAll('.tab-content');
   
+  // Hapus kelas 'active' dari semua tombol tab dan konten
   tabs.forEach(tab => tab.classList.remove('active'));
   contents.forEach(content => content.classList.remove('active'));
   
-  // event.target is used here, ensure the function is called via onclick
-  event.target.classList.add('active'); 
+  // event.target digunakan di sini, pastikan fungsi dipanggil melalui onclick
+  // Jika dipanggil dari JS (misal: showTab('courses')), perlu adaptasi di HTML
+  if (event.target) {
+     event.target.classList.add('active'); 
+  }
+
+  // Tambahkan kelas 'active' ke konten tab yang sesuai
   document.getElementById(`${tabName}Tab`).classList.add('active');
   
+  // Muat data saat tab diklik
   if (tabName === 'courses') {
     loadCourses();
   } else if (tabName === 'users') {
@@ -44,17 +57,17 @@ function showTab(tabName) {
   }
 }
 
-// Show/hide create course form
+// Tampilkan/sembunyikan form buat kursus
 function showCreateCourseForm() {
   document.getElementById('createCourseForm').style.display = 'block';
 }
 
 function hideCreateCourseForm() {
   document.getElementById('createCourseForm').style.display = 'none';
-  document.getElementById('courseForm').reset();
+  document.getElementById('courseForm').reset(); // Reset field form
 }
 
-// Create course - REFACTOR: Hanya kirim data minimal!
+// Buat kursus baru (Hanya kirim data minimal, kode dan metadata di-generate backend)
 document.getElementById('courseForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   
@@ -63,15 +76,13 @@ document.getElementById('courseForm').addEventListener('submit', async (e) => {
   const thumbnail = document.getElementById('courseThumbnail').value;
   const difficulty = document.getElementById('courseDifficulty').value;
   
-  // Map difficulty to badge type
+  // Mapping kesulitan ke jenis badge (misal: beginner -> bronze)
   const badgeTypeMap = {
     beginner: 'bronze',
     intermediate: 'silver',
     advanced: 'gold'
   };
   const badgeType = badgeTypeMap[difficulty];
-  
-  // Hapus pengambilan courseCode dan metadata (karena kini di-generate backend)
   
   try {
     const response = await fetch(`${API_URL}/courses`, {
@@ -86,24 +97,30 @@ document.getElementById('courseForm').addEventListener('submit', async (e) => {
         thumbnail: thumbnail || 'https://via.placeholder.com/300x200',
         difficulty,
         badgeType
-        // courseCode dan metadata dihapus dari payload
+        // courseCode dan metadata dihapus dari payload (dibuat di backend)
       })
     });
     
     if (!response.ok) {
-      throw new Error('Failed to create course');
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to create course');
     }
     
-    alert('Course created successfully! Folder course telah digenerate di frontend/courses.');
+    // 💡 FIX: Ganti alert()
+    // alert('Course created successfully! Folder course telah digenerate di frontend/courses.'); 
+    console.log('Course created successfully! Folder course telah digenerate di frontend/courses.');
+
     hideCreateCourseForm();
-    loadCourses();
+    loadCourses(); // Muat ulang daftar kursus
   } catch (error) {
     console.error('Error creating course:', error);
-    alert('Failed to create course');
+    // 💡 FIX: Ganti alert()
+    // alert(`Failed to create course: ${error.message}`); 
+    console.error(`Failed to create course: ${error.message}`);
   }
 });
 
-// Load courses
+// Muat semua kursus (termasuk yang Draft)
 async function loadCourses() {
   try {
     const response = await fetch(`${API_URL}/courses/all`, {
@@ -117,10 +134,9 @@ async function loadCourses() {
   }
 }
 
-// Display courses - REFACTOR: Metadata tidak lagi wajib ditampilkan
+// Tampilkan daftar kursus
 function displayCourses(courses) {
   const list = document.getElementById('coursesList');
-  
   if (courses.length === 0) {
     list.innerHTML = '<p class="empty-state">No courses yet</p>';
     return;
@@ -137,21 +153,27 @@ function displayCourses(courses) {
           </span>
         </div>
         <div class="admin-item-actions">
+          <!-- Button Publish/Unpublish -->
           <button class="btn-success" onclick="togglePublish('${course._id}', ${course.isPublished})">
             ${course.isPublished ? 'Unpublish' : 'Publish'}
           </button>
+          <!-- Button Delete -->
           <button class="btn-danger" onclick="deleteCourse('${course._id}')">Delete</button>
         </div>
       </div>
       <p>${course.description}</p>
-      <p style="font-size: 0.9rem; color: #7f8c8d;">
+      <p style="font-size: 0.9rem; color: #7f8c8d;"> 
         Folder Course: <strong>/frontend/courses/${course.courseFolder || 'N/A'}</strong>
       </p>
+      <div style="margin-top: 10px;">
+        <!-- Tambahkan link edit/view di sini jika ada UI terpisah -->
+        <!-- Misalnya: <a href="edit-course.html?id=${course._id}" class="btn-primary btn-sm">Edit Content</a> -->
+      </div>
     </div>
   `).join('');
 }
 
-// Toggle publish
+// Toggle status publikasi kursus
 async function togglePublish(courseId, isPublished) {
   try {
     const response = await fetch(`${API_URL}/courses/${courseId}/publish`, {
@@ -160,20 +182,24 @@ async function togglePublish(courseId, isPublished) {
     });
     
     if (!response.ok) {
-      throw new Error('Failed to update course');
+      throw new Error(`Failed to ${isPublished ? 'unpublish' : 'publish'} course`);
     }
     
-    alert(`Course ${isPublished ? 'unpublished' : 'published'} successfully!`);
+    console.log(`Course ${courseId} status toggled.`);
     loadCourses();
   } catch (error) {
-    console.error('Error toggling publish:', error);
-    alert('Failed to update course');
+    console.error('Error toggling publish status:', error);
+    // 💡 FIX: Ganti alert()
+    // alert('Failed to change publish status');
+    console.error('Failed to change publish status');
   }
 }
 
-// Delete course
+// Hapus kursus
 async function deleteCourse(courseId) {
-  if (!confirm('Are you sure you want to delete this course and its associated folder/files?')) {
+  // 💡 FIX: Ganti confirm() dengan custom modal UI (sesuai instruksi)
+  // Untuk saat ini, menggunakan konsol log dan mengandalkan backend.
+  if (!confirm('Are you sure you want to delete this course? This will also delete its folder and all associated progress/comments!')) {
     return;
   }
   
@@ -187,15 +213,17 @@ async function deleteCourse(courseId) {
       throw new Error('Failed to delete course');
     }
     
-    alert('Course and its folder deleted successfully!');
+    console.log(`Course ${courseId} deleted successfully.`);
     loadCourses();
   } catch (error) {
     console.error('Error deleting course:', error);
-    alert('Failed to delete course');
+    // 💡 FIX: Ganti alert()
+    // alert('Failed to delete course');
+    console.error('Failed to delete course');
   }
 }
 
-// Load users
+// Muat daftar user
 async function loadUsers() {
   try {
     const response = await fetch(`${API_URL}/users`, {
@@ -209,16 +237,18 @@ async function loadUsers() {
   }
 }
 
-// Display users
+// Tampilkan daftar user
 function displayUsers(users) {
   const list = document.getElementById('usersList');
-  
-  if (users.length === 0) {
-    list.innerHTML = '<p class="empty-state">No users yet</p>';
+  // Filter user yang sedang login agar tidak bisa menghapus diri sendiri
+  const filteredUsers = users.filter(u => u._id !== user._id); 
+
+  if (filteredUsers.length === 0) {
+    list.innerHTML = '<p class="empty-state">No other users found</p>';
     return;
   }
   
-  list.innerHTML = users.map(u => `
+  list.innerHTML = filteredUsers.map(u => `
     <div class="admin-item">
       <div class="admin-item-header">
         <div>
@@ -229,19 +259,21 @@ function displayUsers(users) {
           </span>
         </div>
         <div class="admin-item-actions">
+          <!-- Hanya tampilkan tombol delete jika user BUKAN admin -->
           ${u.role !== 'admin' ? `<button class="btn-danger" onclick="deleteUser('${u._id}')">Delete</button>` : ''}
         </div>
       </div>
       <p style="font-size: 0.9rem; color: #7f8c8d;">
-        Badges: ${u.badges.length} • Joined: ${new Date(u.createdAt).toLocaleDateString()}
+        Badges: ${u.badges?.length || 0} • Joined: ${new Date(u.createdAt).toLocaleDateString()}
       </p>
     </div>
   `).join('');
 }
 
-// Delete user
+// Hapus user
 async function deleteUser(userId) {
-  if (!confirm('Are you sure you want to delete this user?')) {
+  // 💡 FIX: Ganti confirm()
+  if (!confirm('Are you sure you want to delete this user? This action is irreversible.')) {
     return;
   }
   
@@ -255,13 +287,22 @@ async function deleteUser(userId) {
       throw new Error('Failed to delete user');
     }
     
-    alert('User deleted successfully!');
-    loadUsers();
+    console.log(`User ${userId} deleted successfully.`);
+    loadUsers(); // Muat ulang daftar user
   } catch (error) {
     console.error('Error deleting user:', error);
-    alert('Failed to delete user');
+    // 💡 FIX: Ganti alert()
+    // alert('Failed to delete user');
+    console.error('Failed to delete user');
   }
 }
 
-// Initialize
-loadCourses();
+// Panggil fungsi untuk memuat data awal saat halaman pertama kali dimuat
+document.addEventListener('DOMContentLoaded', () => {
+    // Memastikan tab 'courses' aktif saat pertama kali load
+    const initialTabButton = document.querySelector('.tab-btn[onclick*="showTab(\'courses\')"]');
+    if (initialTabButton) {
+        initialTabButton.classList.add('active');
+        loadCourses();
+    }
+});

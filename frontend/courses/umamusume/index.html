@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Belajar Uma Musume Pretty Derby</title> 
+  
+  <style>
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  margin: 0;
+  padding: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+}
+
+header {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+  padding: 15px 25px;
+  margin-bottom: 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+}
+
+header div:first-child {
+  display: flex;
+  align-items: center;
+}
+
+h1 {
+  color: white;
+  margin: 0;
+  font-size: 1.8em;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+h2 {
+  color: #f5576c;
+  border-bottom: 3px solid #f093fb;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+.course-section, .course-quiz {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  margin-bottom: 25px;
+  transition: transform 0.2s;
+}
+
+.course-section:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+}
+
+.course-section p {
+  color: #555;
+  margin-bottom: 15px;
+}
+
+.course-section ul {
+  color: #555;
+  margin-left: 20px;
+}
+
+.course-section ul li {
+  margin-bottom: 8px;
+}
+
+.complete-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 25px;
+  cursor: pointer;
+  margin-top: 15px;
+  font-weight: bold;
+  transition: all 0.3s;
+}
+
+.complete-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.completed {
+  color: #28a745;
+  font-weight: bold;
+  margin-left: 10px;
+  font-size: 1.1em;
+}
+
+.incomplete {
+  color: #ffc107;
+  font-weight: bold;
+  margin-left: 10px;
+}
+
+#quiz-result {
+  margin-top: 15px;
+  padding: 15px;
+  border: 2px solid #f093fb;
+  border-radius: 8px;
+  background: #fff5f8;
+}
+
+#question-container {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}
+
+#question-container p {
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+#question-container label {
+  display: block;
+  padding: 8px;
+  margin: 5px 0;
+  cursor: pointer;
+  transition: background 0.2s;
+  border-radius: 5px;
+}
+
+#question-container label:hover {
+  background: #e9ecef;
+}
+
+#question-container input[type="radio"] {
+  margin-right: 10px;
+}
+
+#question-container button {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 25px;
+  cursor: pointer;
+  margin-top: 15px;
+  font-weight: bold;
+  transition: all 0.3s;
+}
+
+#question-container button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+#progress-display {
+  background: rgba(255,255,255,0.2);
+  padding: 8px 15px;
+  border-radius: 20px;
+  font-weight: bold;
+}
+
+.back-btn {
+  background: rgba(255,255,255,0.3);
+  color: white;
+  border: 2px solid white;
+  padding: 8px 15px;
+  border-radius: 20px;
+  cursor: pointer;
+  margin-right: 15px;
+  font-weight: bold;
+  transition: all 0.3s;
+}
+
+.back-btn:hover {
+  background: rgba(255,255,255,0.5);
+}
+
+.character-highlight {
+  background: linear-gradient(135deg, #fff5f8 0%, #ffeef5 100%);
+  padding: 15px;
+  border-left: 4px solid #f5576c;
+  border-radius: 8px;
+  margin: 15px 0;
+}
+
+.tip-box {
+  background: #e7f3ff;
+  border-left: 4px solid #2196F3;
+  padding: 15px;
+  border-radius: 8px;
+  margin: 15px 0;
+}
+  </style>
+</head>
+<body>
+
+  <header>
+    <div>
+      <button onclick="goBack()" class="back-btn">⬅️ Kembali</button>
+      <h1>🏇 Uma Musume Pretty Derby</h1> 
+    </div>
+    <div id="progress-display">Progres: 0%</div>
+  </header>
+
+  <main>
+    <section id="section_1" class="course-section">
+      <h2>1. Pengenalan Uma Musume 🌟</h2> 
+      <p><strong>Uma Musume Pretty Derby</strong> adalah franchise multimedia Jepang yang menggabungkan elemen balap kuda dengan karakter gadis antropomorfik (kemonomimi). Franchise ini mencakup anime, game mobile, manga, dan berbagai merchandise.</p>
+      
+      <div class="character-highlight">
+        <h3>Konsep Dasar</h3>
+        <p>Dalam dunia Uma Musume, kuda pacuan legendaris dari dunia nyata bereinkarnasi sebagai gadis-gadis cantik dengan telinga dan ekor kuda. Mereka berlatih dan berkompetisi di trek balap, mempertahankan warisan dan nama kuda asli mereka.</p>
+      </div>
+      
+      <p><strong>Media yang Tersedia:</strong></p>
+      <ul>
+        <li>🎬 <strong>Anime</strong>: Season 1 (2018), Season 2 (2021), Season 3 (2023)</li>
+        <li>🎮 <strong>Game Mobile</strong>: Uma Musume Pretty Derby (Cygames)</li>
+        <li>📚 <strong>Manga</strong>: Berbagai spin-off dan adaptasi</li>
+        <li>🎵 <strong>Musik</strong>: Banyak karakter memiliki single dan album sendiri</li>
+      </ul>
+      
+      <div class="tip-box">
+        <strong>💡 Fun Fact:</strong> Setiap karakter Uma Musume didasarkan pada kuda pacuan nyata yang terkenal di Jepang. Misalnya, Special Week, Silence Suzuka, dan Tokai Teio adalah nama kuda asli yang sangat sukses di dunia balap kuda Jepang!
+      </div>
+      
+      <button onclick="markComplete('section_1')" class="complete-btn">Tandai Selesai ✓</button>
+      <span class="status" id="status_section_1"></span>
+    </section>
+    
+    <section id="section_2" class="course-section">
+      <h2>2. Karakter Populer 👧🏇</h2> 
+      <p>Uma Musume memiliki puluhan karakter menarik, masing-masing dengan kepribadian dan cerita unik:</p>
+      
+      <div class="character-highlight">
+        <h3>⭐ Special Week</h3>
+        <p>Protagonis utama Season 1. Gadis energik dari Hokkaido yang bermimpi menjadi Uma Musume terbaik di Jepang. Berdasarkan kuda Special Week yang memenangkan Japan Derby dan Tenno Sho.</p>
+      </div>
+      
+      <div class="character-highlight">
+        <h3>🌸 Silence Suzuka</h3>
+        <p>Uma Musume yang elegan dengan gaya berlari yang indah. Dikenal dengan teknik "nige" (memimpin dari awal). Karakter yang sangat populer di kalangan fans.</p>
+      </div>
+      
+      <div class="character-highlight">
+        <h3>👑 Tokai Teio</h3>
+        <p>Protagonis Season 2. Uma Musume berkarakter ceria dengan julukan "Kaisar". Ceritanya tentang bangkit dari cedera menyentuh banyak hati penonton.</p>
+      </div>
+      
+      <div class="character-highlight">
+        <h3>⚡ Gold Ship</h3>
+        <p>Karakter eksentrik dan unpredictable yang selalu membawa humor ke dalam cerita. Salah satu karakter paling unik dan disukai fans.</p>
+      </div>
+      
+      <p><strong>Karakter Lainnya:</strong> Vodka, Daiwa Scarlet, Mejiro McQueen, Rice Shower, Symboli Rudolf, Air Groove, dan masih banyak lagi!</p>
+      
+      <div class="tip-box">
+        <strong>💡 Tips:</strong> Setiap karakter memiliki gaya berlari berbeda (nige, senkou, sashi, oikomi) yang mencerminkan strategi kuda asli mereka dalam balapan!
+      </div>
+      
+      <button onclick="markComplete('section_2')" class="complete-btn">Tandai Selesai ✓</button>
+      <span class="status" id="status_section_2"></span>
+    </section>
+
+    <section id="section_3" class="course-section">
+      <h2>3. Game Mobile & Gameplay 🎮</h2> 
+      <p>Game Uma Musume Pretty Derby adalah game simulasi training yang sangat populer di Jepang, dirilis oleh Cygames pada Februari 2021.</p>
+      
+      <h3>Gameplay Utama:</h3>
+      <ul>
+        <li><strong>🏋️ Training Mode</strong>: Latih Uma Musume selama 3 tahun untuk menjadi juara</li>
+        <li><strong>🏆 Racing</strong>: Ikuti berbagai balapan dengan strategi yang tepat</li>
+        <li><strong>💪 Stats Building</strong>: Tingkatkan Speed, Stamina, Power, Guts, dan Wisdom</li>
+        <li><strong>🎴 Support Cards</strong>: Gunakan kartu support untuk memperkuat training</li>
+        <li><strong>📖 Scenario Routes</strong>: Berbagai cerita dan jalur untuk setiap karakter</li>
+      </ul>
+      
+      <div class="tip-box">
+        <h3>Tips Bermain untuk Pemula:</h3>
+        <ul>
+          <li>Fokus pada 2-3 stat utama sesuai gaya berlari Uma Musume</li>
+          <li>Jaga kondisi kesehatan (mood hijau = performa terbaik)</li>
+          <li>Perhatikan faktor "aptitude" (jarak, track, ground condition)</li>
+          <li>Gunakan skill yang sesuai dengan strategi balapan</li>
+          <li>Ikuti event story untuk mendapat reward bonus</li>
+        </ul>
+      </div>
+      
+      <div class="character-highlight">
+        <h3>Fitur Unik:</h3>
+        <p><strong>Live Concerts:</strong> Setelah memenangkan balapan besar, Uma Musume akan perform di panggung dengan lagu-lagu catchy!</p>
+        <p><strong>Inheritance System:</strong> Uma Musume yang sudah trained bisa menjadi "parent" untuk training selanjutnya, mewariskan stats dan skills.</p>
+      </div>
+      
+      <p><strong>Catatan:</strong> Game ini saat ini hanya tersedia di server Jepang. Pemain internasional perlu menggunakan VPN atau mengikuti panduan khusus untuk bermain.</p>
+      
+      <button onclick="markComplete('section_3')" class="complete-btn">Tandai Selesai ✓</button>
+      <span class="status" id="status_section_3"></span>
+    </section>
+
+    <section id="quiz_1" class="course-quiz">
+      <h2>🏆 Quiz: Seberapa Paham Kamu Tentang Uma Musume?</h2>
+      <div id="question-container">
+        <p>1. Siapa protagonis utama Uma Musume Season 1?</p>
+        <label><input type="radio" name="q1" value="silence"> Silence Suzuka</label>
+        <label><input type="radio" name="q1" value="special"> Special Week</label>
+        <label><input type="radio" name="q1" value="tokai"> Tokai Teio</label>
+        
+        <p>2. Apa yang membuat Uma Musume unik dibandingkan gadis biasa?</p>
+        <label><input type="radio" name="q2" value="sayap"> Mereka memiliki sayap</label>
+        <label><input type="radio" name="q2" value="kuda"> Mereka memiliki telinga dan ekor kuda</label>
+        <label><input type="radio" name="q2" value="tanduk"> Mereka memiliki tanduk</label>
+        
+        <p>3. Studio game mana yang mengembangkan Uma Musume game mobile?</p>
+        <label><input type="radio" name="q3" value="mihoyo"> miHoYo</label>
+        <label><input type="radio" name="q3" value="cygames"> Cygames</label>
+        <label><input type="radio" name="q3" value="square"> Square Enix</label>
+        
+        <p>4. Apa yang dilakukan Uma Musume setelah memenangkan balapan besar?</p>
+        <label><input type="radio" name="q4" value="tidur"> Mereka langsung tidur</label>
+        <label><input type="radio" name="q4" value="konser"> Mereka perform di live concert</label>
+        <label><input type="radio" name="q4" value="makan"> Mereka makan wortel</label>
+        
+        <p>5. Gaya berlari "nige" berarti apa?</p>
+        <label><input type="radio" name="q5" value="akhir"> Sprint di akhir balapan</label>
+        <label><input type="radio" name="q5" value="awal"> Memimpin dari awal balapan</label>
+        <label><input type="radio" name="q5" value="tengah"> Berada di tengah kelompok</label>
+        
+        <button onclick="submitCourseQuiz()">Kirim Jawaban 🎯</button>
+      </div>
+      <div id="quiz-result"></div>
+    </section>
+  </main>
+
+  <script>
+    const COURSE_ID = '693113b55f9309d5571df6c2';
+    const COURSE_SECTIONS = ['section_1', 'section_2', 'section_3']; 
+    const COURSE_QUIZZES = ['quiz_1']; 
+    
+    const QUIZ_ANSWERS = {
+      'q1': 'special',
+      'q2': 'kuda',
+      'q3': 'cygames',
+      'q4': 'konser',
+      'q5': 'awal'
+    };
+    
+    function goBack() {
+      window.history.back(); 
+    }
+
+const API_URL = 'http://localhost:5000/api';
+const TOKEN = localStorage.getItem('token');
+
+const courseAPI = {
+  async markSectionComplete(sectionId) {
+    if (!TOKEN) {
+      alert('Silakan login untuk melacak progres');
+      return;
+    }
+    
+    try {
+      const response = await fetch(`${API_URL}/progress/section`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${TOKEN}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 
+          courseId: COURSE_ID, 
+          sectionId 
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to mark section complete');
+      }
+
+      if (data.badgeEarned) {
+        alert(`🎉 Lencana Diperoleh: ${data.badgeEarned.badgeName}`);
+      }
+      
+      console.log('Section completed:', data);
+      await updateProgressDisplay();
+      return data;
+    } catch (error) {
+      console.error('Error marking section:', error);
+      alert('Gagal menandai section: ' + error.message);
+    }
+  },
+  
+  async submitQuiz(quizId, score) {
+    if (!TOKEN) {
+      alert('Silakan login untuk menyimpan hasil kuis');
+      return;
+    }
+    
+    try {
+      const response = await fetch(`${API_URL}/progress/quiz`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${TOKEN}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          courseId: COURSE_ID,
+          quizId,
+          score
+        })
+      });
+      
+      const data = await response.json();
+
+      if (!response.ok) {
+         throw new Error(data.error || 'Failed to submit quiz results');
+      }
+      
+      if (data.badgeEarned) {
+        alert(`🎉 Lencana Diperoleh: ${data.badgeEarned.badgeName}`);
+      }
+      
+      await updateProgressDisplay();
+      return data;
+    } catch (error) {
+      console.error('Error submitting quiz:', error);
+      alert('Gagal mengirim hasil kuis: ' + error.message);
+    }
+  },
+  
+  async getProgress() {
+    if (!TOKEN) return null;
+    
+    try {
+      const response = await fetch(`${API_URL}/progress/course/${COURSE_ID}`, {
+        headers: {
+          'Authorization': `Bearer ${TOKEN}`
+        }
+      });
+      
+      if (response.ok) {
+        return await response.json();
+      }
+      return null; 
+    } catch (error) {
+      console.error('Error getting progress:', error);
+      return null;
+    }
+  }
+};
+
+function calculateQuizScore() {
+  let score = 0;
+  const questionNames = Object.keys(QUIZ_ANSWERS);
+
+  questionNames.forEach(qName => {
+    const answer = document.querySelector(`input[name="${qName}"]:checked`)?.value;
+    if (answer === QUIZ_ANSWERS[qName]) {
+      score += 1;
+    }
+  });
+
+  return score;
+}
+
+async function markComplete(sectionId) {
+  await courseAPI.markSectionComplete(sectionId);
+}
+
+async function submitCourseQuiz() {
+  const score = calculateQuizScore();
+  const quizId = COURSE_QUIZZES[0]; 
+  
+  const result = await courseAPI.submitQuiz(quizId, score);
+  const resultDiv = document.getElementById('quiz-result');
+
+  if (result) {
+    const totalQuestions = Object.keys(QUIZ_ANSWERS).length; 
+    const passed = result.passed;
+
+    resultDiv.innerHTML = `<strong>Hasil Anda: ${score} dari ${totalQuestions}.</strong><br>`;
+
+    if (passed) {
+      resultDiv.innerHTML += '🎉 Selamat, Anda lulus kuis ini! Anda sudah menguasai dasar-dasar Uma Musume!';
+      document.getElementById('question-container').style.display = 'none';
+    } else {
+      resultDiv.innerHTML += '📚 Anda belum lulus. Baca kembali materi dan coba lagi!';
+    }
+  } else {
+    resultDiv.innerHTML = 'Gagal mengirim hasil kuis.'; 
+  }
+}
+
+async function updateProgressDisplay() {
+  const progress = await courseAPI.getProgress();
+  const display = document.getElementById('progress-display');
+  
+  if (!progress) {
+    display.textContent = 'Progres: Login diperlukan';
+    return;
+  }
+  
+  const safeCompletedSections = progress.completedSections || [];
+  const safeCompletedQuizzes = progress.quizResults 
+    ? progress.quizResults.filter(r => r.passed).map(r => r.quizId) 
+    : [];
+
+  const totalItems = COURSE_SECTIONS.length + COURSE_QUIZZES.length; 
+  const sectionsDone = safeCompletedSections.filter(s => COURSE_SECTIONS.includes(s)).length;
+  const quizzesDone = safeCompletedQuizzes.filter(q => COURSE_QUIZZES.includes(q)).length;
+  const itemsDone = sectionsDone + quizzesDone;
+  
+  const percentage = totalItems > 0 ? Math.round((itemsDone / totalItems) * 100) : 0;
+  
+  display.textContent = `Progres: ${percentage}% (${itemsDone}/${totalItems} item)`;
+  
+  COURSE_SECTIONS.forEach(sectionId => {
+    const statusEl = document.getElementById(`status_${sectionId}`);
+    if (statusEl) {
+      if (safeCompletedSections.includes(sectionId)) {
+        statusEl.textContent = '✅ Selesai';
+        statusEl.classList.add('completed');
+        statusEl.classList.remove('incomplete');
+      } else {
+        statusEl.textContent = '⏳ Belum Selesai';
+        statusEl.classList.add('incomplete');
+        statusEl.classList.remove('completed');
+      }
+    }
+  });
+
+  const quizResultDiv = document.getElementById('quiz-result');
+  const quizId = COURSE_QUIZZES[0];
+  
+  if (safeCompletedQuizzes.includes(quizId)) {
+    quizResultDiv.innerHTML = '<strong>✨ Kuis ini sudah selesai dan tersimpan di riwayat Anda. (Passed)</strong>';
+    const questionContainer = document.getElementById('question-container');
+    if (questionContainer) {
+      questionContainer.style.display = 'none';
+    }
+  } else {
+    const questionContainer = document.getElementById('question-container');
+    if (questionContainer) {
+      questionContainer.style.display = 'block';
+    }
+  }
+}
+
+document.addEventListener('DOMContentLoaded', updateProgressDisplay);
+  </script>
+</body>
+</html>

@@ -1,11 +1,12 @@
-const API_URL = 'http://localhost:5000/api';
+const API_URL = 'http://localhost:5000/api'; // URL dasar untuk API backend
 
-// Toggle between login and register forms
+// Toggle antara form login dan register
 function toggleForm() {
   const loginForm = document.getElementById('loginForm');
   const registerForm = document.getElementById('registerForm');
   const title = document.getElementById('authTitle');
   
+  // Logika tampilan
   if (loginForm.style.display === 'none') {
     loginForm.style.display = 'block';
     registerForm.style.display = 'none';
@@ -16,15 +17,16 @@ function toggleForm() {
     title.textContent = 'Register';
   }
   
-  // Clear message
+  // Bersihkan pesan error/sukses
   document.getElementById('authMessage').style.display = 'none';
 }
 
-// Show message
+// Tampilkan pesan status (sukses/error)
 function showMessage(message, type) {
   const msgDiv = document.getElementById('authMessage');
   msgDiv.textContent = message;
-  msgDiv.className = `message ${type}`;
+  msgDiv.className = `message ${type}`; // Menggunakan kelas CSS untuk styling (misal: 'message success' atau 'message error')
+  msgDiv.style.display = 'block';
 }
 
 // Login
@@ -44,19 +46,22 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     const data = await response.json();
     
     if (!response.ok) {
+      // Melempar error dengan pesan dari backend jika ada
       throw new Error(data.error || 'Login failed');
     }
     
-    // Save token and user
+    // Simpan token dan data user ke localStorage setelah login sukses
     localStorage.setItem('token', data.token);
     localStorage.setItem('user', JSON.stringify(data.user));
     
     showMessage('Login successful! Redirecting...', 'success');
     
+    // Redirect ke halaman utama setelah 1 detik
     setTimeout(() => {
       window.location.href = 'index.html';
     }, 1000);
   } catch (error) {
+    console.error('Login error:', error.message);
     showMessage(error.message, 'error');
   }
 });
@@ -79,24 +84,34 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
     const data = await response.json();
     
     if (!response.ok) {
+      // Melempar error dengan pesan dari backend jika ada
       throw new Error(data.error || 'Registration failed');
     }
     
-    // Save token and user
+    // Simpan token dan data user ke localStorage setelah register sukses
     localStorage.setItem('token', data.token);
     localStorage.setItem('user', JSON.stringify(data.user));
     
     showMessage('Registration successful! Redirecting...', 'success');
     
+    // Redirect ke halaman utama setelah 1 detik
     setTimeout(() => {
       window.location.href = 'index.html';
     }, 1000);
   } catch (error) {
+    console.error('Registration error:', error.message);
     showMessage(error.message, 'error');
   }
 });
 
-// Check if already logged in
-if (localStorage.getItem('token')) {
-  window.location.href = 'index.html';
-}
+// Tentukan form awal yang ditampilkan
+document.addEventListener('DOMContentLoaded', () => {
+    // Pastikan form login yang tampil duluan
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
+    if (loginForm && registerForm) {
+        loginForm.style.display = 'block';
+        registerForm.style.display = 'none';
+        document.getElementById('authTitle').textContent = 'Login';
+    }
+});
